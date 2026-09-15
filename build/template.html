@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Карта школьника: город и область</title>
+<style>html{color-scheme:light dark}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{
+  --page:#eff0f1; --surface:#fafbfb; --surface-2:#f4f5f6;
+  --ink:#16181a; --ink-2:#4c5257; --muted:#7b8288;
+  --line:#e0e2e4; --hair:#eaebed;
+  --accent:#3f6d91; --accent-soft:#dce6ee; --accent-2:#8a6a4b;
+  --good:#14762f; --good-bg:#e2efe4;
+  --warn:#8a5a05; --warn-bg:#f6ecd9;
+  --bad:#a32a2a; --bad-bg:#f6e2e2;
+  --shadow:0 1px 2px rgba(20,24,28,.05);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --page:#121314; --surface:#1b1d1e; --surface-2:#222425;
+    --ink:#f1f2f3; --ink-2:#c2c7cb; --muted:#8b9298;
+    --line:#2c2f31; --hair:#26292b;
+    --accent:#79a8cb; --accent-soft:#25333f; --accent-2:#c09a74;
+    --good:#5bc178; --good-bg:#1d2c21;
+    --warn:#d9a441; --warn-bg:#2e2718;
+    --bad:#e07a7a; --bad-bg:#301d1d;
+    --shadow:0 1px 2px rgba(0,0,0,.3);
+  }
+}
+:root[data-theme="dark"]{
+  --page:#121314; --surface:#1b1d1e; --surface-2:#222425;
+  --ink:#f1f2f3; --ink-2:#c2c7cb; --muted:#8b9298;
+  --line:#2c2f31; --hair:#26292b;
+  --accent:#79a8cb; --accent-soft:#25333f; --accent-2:#c09a74;
+  --good:#5bc178; --good-bg:#1d2c21;
+  --warn:#d9a441; --warn-bg:#2e2718;
+  --bad:#e07a7a; --bad-bg:#301d1d;
+  --shadow:0 1px 2px rgba(0,0,0,.3);
+}
+*{box-sizing:border-box}
+body{
+  background:var(--page); color:var(--ink);
+  font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:15px; line-height:1.5; margin:0; -webkit-text-size-adjust:100%;
+}
+.wrap{max-width:1080px; margin:0 auto; padding-inline:16px; padding-block:24px 56px}
+h1,h2,h3{font-family:"Golos Text","IBM Plex Sans",system-ui,sans-serif; text-wrap:balance; margin:0}
+h1{font-size:clamp(22px,5.2vw,30px); font-weight:600; letter-spacing:-.01em}
+h2{font-size:16px; font-weight:600; letter-spacing:-.005em}
+.eyebrow{font-size:11px; letter-spacing:.09em; text-transform:uppercase; color:var(--muted); font-weight:600}
+.sub{color:var(--ink-2); font-size:13.5px; margin-top:6px}
+header{border-bottom:1px solid var(--line); padding-bottom:18px; margin-bottom:20px}
+.hrow{display:flex; gap:12px; align-items:flex-start; justify-content:space-between; flex-wrap:wrap}
+.hbtns{display:flex; gap:8px; align-items:center}
+.themebtn{font:inherit; font-size:12px; color:var(--ink-2); background:var(--surface);
+  border:1px solid var(--line); border-radius:999px; padding:5px 12px; cursor:pointer}
+.themebtn:hover{color:var(--ink)}
+
+/* ---- стартовый экран ---- */
+.hero{padding-block:clamp(16px,6vw,54px)}
+.hero .eyebrow{display:block; margin-bottom:10px}
+.hero h1{font-size:clamp(26px,6.4vw,40px)}
+.hero .lede{color:var(--ink-2); font-size:clamp(14px,2.6vw,16px); margin-top:10px; max-width:56ch}
+.choices{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:clamp(20px,4vw,34px)}
+@media(max-width:700px){.choices{grid-template-columns:1fr}}
+.choice{
+  display:block; text-align:left; width:100%; font:inherit; color:inherit; cursor:pointer;
+  background:var(--surface); border:1px solid var(--line); border-radius:14px;
+  padding:20px 20px 18px; box-shadow:var(--shadow); transition:border-color .12s, transform .12s;
+}
+.choice:hover{border-color:var(--accent); transform:translateY(-1px)}
+.choice .ttl{font-family:"Golos Text",sans-serif; font-weight:600; font-size:19px; display:flex; align-items:baseline; justify-content:space-between; gap:10px}
+.choice .big, .choice .bigsub{display:block}
+.choice .ttl .arrow{color:var(--accent); font-size:15px}
+.choice .big{font-family:"Golos Text",sans-serif; font-size:clamp(26px,5.6vw,34px); font-weight:600; letter-spacing:-.02em; margin-top:14px; line-height:1.1}
+.choice .bigsub{font-size:12.5px; color:var(--muted); margin-top:2px}
+.choice ul{margin:14px 0 0; padding:0; list-style:none; border-top:1px solid var(--hair); padding-top:12px; display:grid; gap:5px}
+.choice li{font-size:12.5px; color:var(--ink-2); display:flex; justify-content:space-between; gap:10px}
+.choice li b{font-weight:600; font-variant-numeric:tabular-nums}
+.startfoot{margin-top:22px; font-size:12px; color:var(--muted)}
+
+.backbtn{font:inherit; font-size:12.5px; color:var(--ink-2); background:none; border:0; padding:4px 0; cursor:pointer; display:inline-flex; gap:6px; align-items:center}
+.backbtn:hover{color:var(--accent)}
+
+/* ---- KPI ---- */
+.kpis{display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:22px}
+@media(max-width:720px){.kpis{grid-template-columns:repeat(2,1fr)}}
+.kpi{background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:13px 14px; box-shadow:var(--shadow)}
+.kpi .lab{font-size:11.5px; color:var(--muted); letter-spacing:.02em}
+.kpi .val{font-family:"Golos Text",system-ui,sans-serif; font-size:clamp(20px,4.6vw,26px); font-weight:600; letter-spacing:-.02em; margin-top:3px; line-height:1.15}
+.kpi .note{font-size:11.5px; color:var(--ink-2); margin-top:4px}
+.kpi .note.up{color:var(--good)} .kpi .note.bad{color:var(--bad)} .kpi .note.wn{color:var(--warn)}
+
+section{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px; margin-bottom:14px; box-shadow:var(--shadow)}
+.shead{display:flex; align-items:baseline; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-bottom:12px}
+.shead p{margin:0; font-size:12.5px; color:var(--muted)}
+.filters{display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:14px}
+select,input[type=search]{font:inherit; font-size:13px; color:var(--ink); background:var(--surface);
+  border:1px solid var(--line); border-radius:8px; padding:7px 10px; min-width:0}
+input[type=search]{flex:1 1 150px}
+select:focus-visible,input:focus-visible,button:focus-visible{outline:2px solid var(--accent); outline-offset:1px}
+
+/* ---- charts ---- */
+.chartbox{position:relative}
+svg{display:block; width:100%; height:auto; max-width:100%}
+.tt{position:absolute; pointer-events:none; z-index:5; background:var(--surface);
+  border:1px solid var(--line); border-radius:8px; padding:7px 9px; font-size:12px;
+  box-shadow:0 4px 14px rgba(20,24,28,.12); white-space:nowrap; opacity:0; transition:opacity .1s}
+.tt b{font-family:"Golos Text",sans-serif; font-weight:600}
+.tt .m{color:var(--muted)}
+
+/* ---- bars ---- */
+.bars{display:flex; flex-direction:column; gap:7px}
+.bar{display:grid; grid-template-columns:minmax(96px,160px) 1fr auto; gap:10px; align-items:center; cursor:pointer;
+  border:0; background:none; padding:3px 4px; border-radius:7px; text-align:left; font:inherit; color:inherit; width:100%}
+.bar:hover{background:var(--surface-2)}
+.bar[aria-pressed=true]{background:var(--accent-soft)}
+.bar.static{cursor:default}
+.bar.static:hover{background:none}
+.bar .nm{font-size:12.5px; color:var(--ink-2); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.bar .track{display:block; height:16px; background:var(--hair); border-radius:3px; overflow:hidden}
+.bar .fill{display:block; height:100%; min-width:3px; background:var(--accent); border-radius:0 4px 4px 0}
+.bar .v{font-size:12.5px; font-variant-numeric:tabular-nums; color:var(--ink); min-width:74px; text-align:right}
+.bar .v small{color:var(--muted); font-size:11.5px}
+@media(max-width:520px){.bar{grid-template-columns:1fr; gap:3px} .bar .v{text-align:left;min-width:0} .bar .nm{white-space:normal}}
+
+/* ---- meters ---- */
+.meters{display:grid; grid-template-columns:repeat(2,1fr); gap:14px 20px}
+@media(max-width:620px){.meters{grid-template-columns:1fr}}
+.meter .mtop{display:flex; justify-content:space-between; align-items:baseline; gap:10px; font-size:13px; margin-bottom:5px}
+.meter .mtop b{font-family:"Golos Text",sans-serif; font-weight:600; font-variant-numeric:tabular-nums}
+.meter .track{height:8px; background:var(--hair); border-radius:4px; overflow:hidden}
+.meter .track i{display:block; height:100%; border-radius:4px; background:var(--accent)}
+.meter.good .track i{background:var(--good)} .meter.warn .track i{background:var(--warn)} .meter.bad .track i{background:var(--bad)}
+.meter .cap{font-size:11.5px; color:var(--muted); margin-top:4px}
+
+/* ---- table ---- */
+.tblwrap{overflow-x:auto; margin:0 -4px}
+table{border-collapse:collapse; width:100%; font-size:13px}
+th,td{padding:7px 8px; text-align:left; border-bottom:1px solid var(--hair); vertical-align:middle}
+th{font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); font-weight:600; white-space:nowrap; cursor:pointer; user-select:none; position:sticky; top:0; background:var(--surface)}
+th.num,td.num{text-align:right; font-variant-numeric:tabular-nums}
+tbody tr:hover{background:var(--surface-2)}
+td.sch{font-weight:500}
+td.op{color:var(--muted); font-size:12px}
+.spark{width:82px; height:20px}
+
+.chip{display:inline-flex; align-items:center; gap:4px; font-size:11.5px; padding:2px 7px; border-radius:999px; white-space:nowrap; font-weight:500}
+.chip.ok{background:var(--good-bg); color:var(--good)}
+.chip.no{background:var(--bad-bg); color:var(--bad)}
+.chip.wn{background:var(--warn-bg); color:var(--warn)}
+.chip.na{background:var(--surface-2); color:var(--muted)}
+
+.opcard{border:1px solid var(--line); border-radius:10px; padding:12px; margin-bottom:10px; background:var(--surface)}
+.ophead{display:flex; justify-content:space-between; align-items:baseline; gap:10px; flex-wrap:wrap; margin-bottom:9px}
+.ophead .nm{font-family:"Golos Text",sans-serif; font-weight:600; font-size:14.5px}
+.ophead .mt{font-size:12px; color:var(--muted)}
+.opmeta{display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px}
+.rgrid{overflow-x:auto}
+.rgrid table{font-size:12.5px}
+.rgrid th{font-size:10px; position:static}
+.rgrid td.c{text-align:center; width:42px}
+.dot{display:inline-block; width:17px; height:17px; line-height:17px; border-radius:5px; font-size:11px; font-weight:700; text-align:center}
+.dot.ok{background:var(--good-bg); color:var(--good)}
+.dot.no{background:var(--bad-bg); color:var(--bad)}
+.dot.na{background:var(--surface-2); color:var(--muted)}
+
+.issue{display:flex; gap:10px; padding:11px 0; border-bottom:1px solid var(--hair)}
+.issue:last-child{border-bottom:0}
+.sev{width:3px; border-radius:2px; flex:0 0 3px}
+.sev.c{background:var(--bad)} .sev.w{background:var(--warn)} .sev.i{background:var(--accent)}
+.issue .body{min-width:0}
+.issue .t{font-weight:600; font-size:13.5px}
+.issue .d{font-size:12.5px; color:var(--ink-2); margin-top:3px}
+.issue .d ul{margin:5px 0 0; padding-left:18px}
+.issue .d li{margin-bottom:2px}
+blockquote{margin:6px 0 0; padding-left:10px; border-left:2px solid var(--line); color:var(--ink-2); font-size:12.5px; white-space:pre-wrap}
+.legend{display:flex; gap:12px; flex-wrap:wrap; font-size:11.5px; color:var(--muted); margin-top:10px}
+footer{color:var(--muted); font-size:11.5px; margin-top:18px; text-align:center}
+.empty{color:var(--muted); font-size:13px; padding:14px 0}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+
+<!-- ============ СТАРТ ============ -->
+<div id="screen-start">
+  <div class="hrow" style="justify-content:flex-end"><button class="themebtn" id="theme0" type="button">Тема</button></div>
+  <div class="hero">
+    <span class="eyebrow">Карта школьника · Калининградская область</span>
+    <h1>Школьное питание: два контура</h1>
+    <p class="lede">Город работает в боевом режиме — продажи идут с 2 сентября. Область на стадии подключения: карты, меню и оборудование. Выберите контур.</p>
+    <div class="choices" id="choices"></div>
+    <p class="startfoot" id="startfoot"></p>
+  </div>
+</div>
+
+<!-- ============ ГОРОД ============ -->
+<div id="screen-city" hidden>
+  <header>
+    <div class="hrow">
+      <div>
+        <button class="backbtn" data-back>← Выбор контура</button>
+        <div class="eyebrow" style="margin-top:6px">Город Калининград · городской контур</div>
+        <h1>Операторы питания: готовность и продажи</h1>
+        <div class="sub" id="citySub"></div>
+      </div>
+      <div class="hbtns"><button class="themebtn" data-goto="oblast" type="button">Область →</button><button class="themebtn" data-theme-toggle type="button">Тема</button></div>
+    </div>
+  </header>
+
+  <div class="kpis" id="cityKpis"></div>
+
+  <section>
+    <div class="shead"><h2>Транзакции по дням</h2><p id="dynNote"></p></div>
+    <div class="chartbox" id="lineBox"></div>
+    <div class="legend"><span>Количество транзакций рассчитано из оборотов по среднему чеку 150 ₽, округление до целого по каждому дню</span></div>
+  </section>
+
+  <section>
+    <div class="shead"><h2>Операторы</h2><p>Нажмите на оператора — фильтруются график и таблица</p></div>
+    <div class="bars" id="opBars"></div>
+  </section>
+
+  <section>
+    <div class="shead"><h2>Школы</h2><p id="schNote"></p></div>
+    <div class="filters">
+      <input type="search" id="q" placeholder="Поиск по школе или оператору" aria-label="Поиск">
+      <select id="onlyf" aria-label="Фильтр">
+        <option value="all">Все школы</option>
+        <option value="zero">С нулевыми днями</option>
+        <option value="gaps">С незаполненными данными</option>
+      </select>
+    </div>
+    <div class="tblwrap">
+      <table id="schTable">
+        <thead><tr>
+          <th data-k="name">Школа</th><th data-k="op">Оператор</th><th>Динамика</th>
+          <th class="num" data-k="total">Транзакций</th><th class="num" data-k="last">Последний день</th><th>Статус</th>
+        </tr></thead><tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="shead"><h2>Готовность по корпусам</h2><p>ГП — меню горячего питания, БУФ — меню буфета, К1/К2 — корпуса</p></div>
+    <div id="ready"></div>
+    <div class="legend">
+      <span><span class="dot ok">✓</span> заведено</span>
+      <span><span class="dot no">✕</span> не заведено</span>
+      <span><span class="dot na">—</span> корпуса нет</span>
+    </div>
+  </section>
+
+  <section>
+    <div class="shead"><h2>Проблемные зоны</h2><p id="cityIssuesNote"></p></div>
+    <div id="issues"></div>
+  </section>
+</div>
+
+<!-- ============ ОБЛАСТЬ ============ -->
+<div id="screen-oblast" hidden>
+  <header>
+    <div class="hrow">
+      <div>
+        <button class="backbtn" data-back>← Выбор контура</button>
+        <div class="eyebrow" style="margin-top:6px">Калининградская область · муниципальный контур</div>
+        <h1>Подключение школ: карты, меню, оборудование</h1>
+        <div class="sub" id="oblSub"></div>
+      </div>
+      <div class="hbtns"><button class="themebtn" data-goto="city" type="button">← Город</button><button class="themebtn" data-theme-toggle type="button">Тема</button></div>
+    </div>
+  </header>
+
+  <div class="kpis" id="oblKpis"></div>
+
+  <section>
+    <div class="shead"><h2>Привязка карт по муниципалитетам</h2><p>Нажмите на муниципалитет — фильтруется таблица школ</p></div>
+    <div class="bars" id="oblCityBars"></div>
+    <div class="legend"><span>Справа — привязанных карт и доля от числа учащихся</span></div>
+  </section>
+
+  <section>
+    <div class="shead"><h2>Готовность питания</h2><p>Доля школ области, по данным на 14.09</p></div>
+    <div class="meters" id="oblMeters"></div>
+  </section>
+
+  <section>
+    <div class="shead"><h2>Операторы питания области</h2><p>7 КШП · нажмите для фильтрации таблицы</p></div>
+    <div class="tblwrap">
+      <table id="kshpTable">
+        <thead><tr>
+          <th>Оператор (КШП)</th><th class="num">Школ</th><th class="num">Учащихся</th>
+          <th class="num">Карт</th><th class="num">% карт</th><th>Меню</th><th class="num">СБС</th><th class="num">СКУД</th><th class="num">Заявок</th>
+        </tr></thead><tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="shead"><h2>Школы области</h2><p id="oblSchNote"></p></div>
+    <div class="filters">
+      <input type="search" id="oq" placeholder="Поиск по школе, муниципалитету, оператору" aria-label="Поиск">
+      <select id="oonly" aria-label="Фильтр">
+        <option value="all">Все школы</option>
+        <option value="nocards">Без привязанных карт</option>
+        <option value="nomenu">Без активного меню</option>
+        <option value="orders">С заявками на питание</option>
+        <option value="skud">Со СКУД</option>
+      </select>
+    </div>
+    <div class="tblwrap">
+      <table id="oblTable">
+        <thead><tr>
+          <th data-k="school">Школа</th><th data-k="city">Муниципалитет</th><th data-k="kshpShort">Оператор</th>
+          <th class="num" data-k="pupils">Уч-ся</th><th class="num" data-k="cards">Карт</th><th class="num" data-k="pct">%</th>
+          <th class="num" data-k="parents">ЛК</th><th>Меню</th><th>Оборудование</th>
+        </tr></thead><tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="shead"><h2>Проблемные зоны</h2><p>По состоянию на 14.09.2026</p></div>
+    <div id="oblIssues"></div>
+  </section>
+</div>
+
+<footer id="foot"></footer>
+</div>
+
+<script>
+<!--DATA-->
+const CITY = DATA.city, OBL = DATA.oblast;
+const D = CITY.dates, OPS = CITY.operators;
+
+const fmt = n => Math.round(n).toLocaleString('ru-RU');
+const pct = (a,b) => b ? (100*a/b).toFixed(1).replace('.',',')+'%' : '—';
+const plural = (n, one, few, many) => {
+  const a = Math.abs(n) % 100, b = a % 10;
+  if(a > 10 && a < 20) return many;
+  if(b > 1 && b < 5) return few;
+  if(b === 1) return one;
+  return many;
+};
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const li = a => '<ul>'+a.map(x=>'<li>'+x+'</li>').join('')+'</ul>';
+
+/* ===================== ГОРОД: подготовка ===================== */
+const SCHOOLS = [];
+OPS.forEach(o => o.schools.forEach(s => SCHOOLS.push(Object.assign({op:o.name}, s))));
+SCHOOLS.forEach(s => {
+  s.total = s.sales.reduce((a,b)=>a+b,0);
+  s.last = s.sales[s.sales.length-1];
+  s.zeros = s.sales.filter(v=>v===0).length;
+  s.gaps = [s.hot1,s.hot2,s.buf1,s.buf2,s.sets,s.started].filter(v=>v===false).length;
+});
+const daily = list => D.map((_,i)=> list.reduce((a,s)=>a+s.sales[i],0));
+const ALLD = daily(SCHOOLS);
+const CITY_TOTAL = ALLD.reduce((a,b)=>a+b,0);
+const activeSchools = SCHOOLS.filter(s=>s.total>0).length;
+const gapSchools = SCHOOLS.filter(s=>s.gaps>0).length;
+
+/* ===================== ОБЛАСТЬ: подготовка ===================== */
+const OS = OBL.schools;
+OS.forEach(r => r.pct = r.pupils ? r.cards/r.pupils*100 : 0);
+const sum = (arr,f) => arr.reduce((a,x)=>a+f(x),0);
+const O = {
+  n: OS.length,
+  cities: [...new Set(OS.map(r=>r.city))],
+  pupils: sum(OS,r=>r.pupils), ls: sum(OS,r=>r.ls),
+  cards: sum(OS,r=>r.cards), parents: sum(OS,r=>r.parents),
+  menu: OS.filter(r=>r.menu).length,
+  sbs: OS.filter(r=>r.sbs).length,
+  skudInst: OS.filter(r=>r.skudInst).length,
+  skudConn: OS.filter(r=>r.skudConn).length,
+  terminals: sum(OS,r=>r.terminals),
+  orders: sum(OS,r=>r.orders),
+  noCards: OS.filter(r=>r.cards===0).length,
+  withOrders: OS.filter(r=>r.orders>0).length,
+};
+const byCity = {};
+OS.forEach(r => {
+  const a = byCity[r.city] || (byCity[r.city] = {city:r.city,n:0,pupils:0,cards:0,parents:0,menu:0,sbs:0,skud:0,term:0});
+  a.n++; a.pupils+=r.pupils; a.cards+=r.cards; a.parents+=r.parents;
+  a.menu += r.menu?1:0; a.sbs += r.sbs?1:0; a.skud += r.skudInst?1:0; a.term += r.terminals;
+});
+const CITIES = Object.values(byCity).sort((a,b)=>b.cards-a.cards);
+const byKshp = {};
+OS.forEach(r => {
+  const a = byKshp[r.kshpShort] || (byKshp[r.kshpShort] = {name:r.kshpShort,n:0,pupils:0,cards:0,menu:0,sbs:0,skud:0,orders:0});
+  a.n++; a.pupils+=r.pupils; a.cards+=r.cards;
+  a.menu += r.menu?1:0; a.sbs += r.sbs?1:0; a.skud += r.skudInst?1:0; a.orders += r.orders;
+});
+const KSHP = Object.values(byKshp).sort((a,b)=>b.n-a.n);
+
+/* ===================== роутер ===================== */
+const screens = {start:'screen-start', city:'screen-city', oblast:'screen-oblast'};
+function show(name){
+  Object.entries(screens).forEach(([k,id]) => document.getElementById(id).hidden = (k!==name));
+  document.getElementById('foot').hidden = (name==='start');
+  if(name==='city') drawLine();
+  window.scrollTo(0,0);
+  try{ location.hash = name==='start' ? '' : name; }catch(e){}
+}
+document.querySelectorAll('[data-back]').forEach(b=> b.onclick = ()=>show('start'));
+document.querySelectorAll('[data-goto]').forEach(b=> b.onclick = ()=>show(b.dataset.goto));
+
+function toggleTheme(){
+  const cur = document.documentElement.getAttribute('data-theme');
+  const dark = cur ? cur === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.setAttribute('data-theme', dark ? 'light' : 'dark');
+  drawLine(); renderCityTable();
+}
+document.getElementById('theme0').onclick = toggleTheme;
+document.querySelectorAll('[data-theme-toggle]').forEach(b=> b.onclick = toggleTheme);
+
+/* ===================== стартовый экран ===================== */
+document.getElementById('choices').innerHTML = `
+  <button class="choice" type="button" data-screen="city">
+    <span class="ttl">Город Калининград <span class="arrow">→</span></span>
+    <span class="big">${fmt(CITY_TOTAL)}</span>
+    <span class="bigsub">транзакций за ${D.length} учебных дней (${D[0]}–${D[D.length-1]})</span>
+    <ul>
+      <li><span>Школ</span><b>43</b></li>
+      <li><span>Операторов питания</span><b>${OPS.length}</b></li>
+      <li><span>Школ с продажами</span><b>${activeSchools} из 43</b></li>
+      <li><span>Транзакций в последний день</span><b>${fmt(ALLD[ALLD.length-1])}</b></li>
+    </ul>
+  </button>
+  <button class="choice" type="button" data-screen="oblast">
+    <span class="ttl">Калининградская область <span class="arrow">→</span></span>
+    <span class="big">${fmt(O.cards)}</span>
+    <span class="bigsub">привязанных карт из ${fmt(O.pupils)} учащихся · срез на ${OBL.date}</span>
+    <ul>
+      <li><span>Школ</span><b>${O.n}</b></li>
+      <li><span>Муниципалитетов</span><b>${O.cities.length}</b></li>
+      <li><span>Операторов питания</span><b>${KSHP.length}</b></li>
+      <li><span>Школ с активным меню</span><b>${O.menu} из ${O.n}</b></li>
+    </ul>
+  </button>`;
+document.querySelectorAll('.choice').forEach(c=> c.onclick = ()=>show(c.dataset.screen));
+document.getElementById('startfoot').textContent =
+  `Город — выгрузка «Операторы питания» за ${D[0]}–${D[D.length-1]}, обороты пересчитаны в транзакции по 150 ₽. Область — отчёт на ${OBL.date}.`;
+document.getElementById('foot').textContent =
+  `Источники: «Операторы питания» (город, ${D[0]}–${D[D.length-1]}) и «Отчет Калининград ${OBL.date}» (область). Обновлено ${DATA.updated}.`;
+
+/* ===================== ГОРОД: KPI ===================== */
+document.getElementById('citySub').textContent =
+  `${OPS.length} операторов · 43 школы · учебные дни ${D[0]}–${D[D.length-1]} · 1 транзакция = 150 ₽`;
+document.getElementById('cityKpis').innerHTML = [
+  ['Транзакций за период', fmt(CITY_TOTAL), `${D.length} учебных дней, 43 школы`, ''],
+  [`Последний день ${D[D.length-1]}`, fmt(ALLD[ALLD.length-1]), '×'+(ALLD[ALLD.length-1]/ALLD[0]).toFixed(1).replace('.',',')+' к первому дню', 'up'],
+  ['Школы с продажами', activeSchools+' из 43', activeSchools<43 ? (43-activeSchools)+' школа без транзакций' : 'все школы работают', activeSchools<43?'bad':''],
+  ['Школы с пробелами', gapSchools+' из 43', 'нет меню, комплексов или продаж', gapSchools?'bad':'']
+].map(([l,v,n,c])=>`<div class="kpi"><div class="lab">${l}</div><div class="val">${v}</div><div class="note ${c}">${n}</div></div>`).join('');
+
+/* ===================== ГОРОД: график ===================== */
+let filterOp = null;
+function drawLine(){
+  const box = document.getElementById('lineBox');
+  if(!box || document.getElementById('screen-city').hidden) return;
+  const list = filterOp ? SCHOOLS.filter(s=>s.op===filterOp) : SCHOOLS;
+  const vals = daily(list);
+  const cw = box.clientWidth || 760;
+  const W = Math.max(320, Math.min(760, Math.round(cw)));
+  const narrow = W < 520;
+  const H = narrow ? 210 : 240, ML = narrow ? 40 : 54, MR = narrow ? 16 : 30, MT = 22, MB = 28;
+  const max = Math.max(...vals)*1.12 || 1;
+  const x = i => ML + i*(W-ML-MR)/(D.length-1);
+  const y = v => MT + (1 - v/max)*(H-MT-MB);
+  const ticks = narrow ? 3 : 4;
+  const line = vals.map((v,i)=>`${i?'L':'M'}${x(i).toFixed(1)} ${y(v).toFixed(1)}`).join(' ');
+  const area = line + ` L${x(D.length-1).toFixed(1)} ${y(0)} L${ML} ${y(0)} Z`;
+  const AC = css('--accent'), MU = css('--muted'), HAIR = css('--hair'), SUR = css('--surface');
+  let g='';
+  for(let t=0;t<=ticks;t++){
+    const v = max*t/ticks, yy = y(v);
+    g += `<line x1="${ML}" y1="${yy.toFixed(1)}" x2="${W-MR}" y2="${yy.toFixed(1)}" stroke="${HAIR}" stroke-width="1"/>`;
+    g += `<text x="${ML-8}" y="${(yy+4).toFixed(1)}" text-anchor="end" font-size="11" fill="${MU}">${v>=1000?Math.round(v/1000)+'к':Math.round(v)}</text>`;
+  }
+  let xs='', dots='', hits='';
+  D.forEach((d,i)=>{
+    const anchor = i===0 ? 'start' : i===D.length-1 ? 'end' : 'middle';
+    if(!narrow || i%2===0 || i===D.length-1)
+      xs += `<text x="${x(i).toFixed(1)}" y="${H-9}" text-anchor="${anchor}" font-size="11" fill="${MU}">${d}</text>`;
+    dots += `<circle cx="${x(i).toFixed(1)}" cy="${y(vals[i]).toFixed(1)}" r="4" fill="${AC}" stroke="${SUR}" stroke-width="2"/>`;
+    hits += `<rect class="hit" data-i="${i}" x="${(x(i)-20).toFixed(1)}" y="${MT}" width="40" height="${H-MT-MB}" fill="transparent"/>`;
+  });
+  const lastLabel = `<text x="${x(D.length-1).toFixed(1)}" y="${Math.max(MT-6, y(vals[D.length-1])-12).toFixed(1)}" text-anchor="end" font-size="12" font-weight="600" fill="${css('--ink')}">${fmt(vals[D.length-1])} тр.</text>`;
+  box.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Транзакции по дням"><defs>
+      <linearGradient id="ag" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="${AC}" stop-opacity="0.20"/><stop offset="100%" stop-color="${AC}" stop-opacity="0.02"/>
+      </linearGradient></defs>
+      ${g}<path d="${area}" fill="url(#ag)"/>
+      <path d="${line}" fill="none" stroke="${AC}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+      ${dots}${lastLabel}${xs}
+      <line id="cross" x1="0" y1="${MT}" x2="0" y2="${H-MB}" stroke="${MU}" stroke-width="1" stroke-dasharray="3 3" opacity="0"/>
+      ${hits}</svg><div class="tt" id="tt"></div>`;
+  document.getElementById('dynNote').textContent =
+    (filterOp || 'Все операторы') + ' · итого ' + fmt(vals.reduce((a,b)=>a+b,0)) + ' транзакций';
+  const tt = document.getElementById('tt'), cross = document.getElementById('cross');
+  box.querySelectorAll('.hit').forEach(r=>{
+    const showTip = e => {
+      const i = +r.dataset.i, rect = box.getBoundingClientRect();
+      const px = rect.width * x(i)/W, py = rect.height * y(vals[i])/H;
+      cross.setAttribute('x1', x(i)); cross.setAttribute('x2', x(i)); cross.setAttribute('opacity','.7');
+      tt.innerHTML = `<span class="m">${D[i]}</span><br><b>${fmt(vals[i])} тр.</b>`;
+      tt.style.opacity = 1;
+      tt.style.left = Math.min(Math.max(px - tt.offsetWidth/2, 0), rect.width - tt.offsetWidth) + 'px';
+      tt.style.top = Math.max(py - tt.offsetHeight - 12, 0) + 'px';
+      e.preventDefault();
+    };
+    r.addEventListener('mouseenter', showTip); r.addEventListener('touchstart', showTip, {passive:false});
+  });
+  box.addEventListener('mouseleave', ()=>{ tt.style.opacity=0; cross.setAttribute('opacity','0'); });
+}
+
+/* ===================== ГОРОД: операторы ===================== */
+function renderOpBars(){
+  const rows = OPS.map(o=>({name:o.name, n:o.schools.length, total:o.schools.reduce((a,s)=>a+s.sales.reduce((x,y)=>x+y,0),0)}))
+                  .sort((a,b)=>b.total-a.total);
+  const max = rows[0].total;
+  document.getElementById('opBars').innerHTML = rows.map(r=>`
+    <button class="bar" type="button" data-op="${r.name}" aria-pressed="${filterOp===r.name}">
+      <span class="nm">${r.name}<span style="color:var(--muted)"> · ${r.n}</span></span>
+      <span class="track"><span class="fill" style="width:${(r.total/max*100).toFixed(1)}%"></span></span>
+      <span class="v">${fmt(r.total)}</span>
+    </button>`).join('');
+  document.querySelectorAll('#opBars .bar').forEach(b=> b.onclick = () => {
+    filterOp = filterOp === b.dataset.op ? null : b.dataset.op;
+    renderOpBars(); drawLine(); renderCityTable();
+    document.getElementById('schTable').scrollIntoView({behavior:'smooth', block:'start'});
+  });
+}
+
+function spark(sales){
+  const w=82,h=20,max=Math.max(...sales,1);
+  const pts = sales.map((v,i)=>`${(i*(w-4)/(sales.length-1)+2).toFixed(1)},${(h-2-(v/max)*(h-5)).toFixed(1)}`).join(' ');
+  const ly = h-2-(sales[sales.length-1]/max)*(h-5);
+  return `<svg class="spark" viewBox="0 0 ${w} ${h}" aria-hidden="true"><polyline points="${pts}" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-linejoin="round"/><circle cx="${w-2}" cy="${ly.toFixed(1)}" r="2" fill="var(--accent)"/></svg>`;
+}
+
+let sortK='total', sortDir=-1;
+function renderCityTable(){
+  const q = document.getElementById('q').value.trim().toLowerCase();
+  const only = document.getElementById('onlyf').value;
+  let rows = SCHOOLS.slice();
+  if(filterOp) rows = rows.filter(s=>s.op===filterOp);
+  if(q) rows = rows.filter(s=>(s.name+' '+s.op).toLowerCase().includes(q));
+  if(only==='zero') rows = rows.filter(s=>s.zeros>=3);
+  if(only==='gaps') rows = rows.filter(s=>s.gaps>0);
+  rows.sort((a,b)=> (typeof a[sortK]==='string' ? a[sortK].localeCompare(b[sortK],'ru') : a[sortK]-b[sortK]) * sortDir);
+  document.querySelector('#schTable tbody').innerHTML = rows.length ? rows.map(s=>{
+    let st;
+    if(s.total===0) st = '<span class="chip no">нет транзакций</span>';
+    else if(s.gaps>0) st = '<span class="chip wn">пробелы: '+s.gaps+'</span>';
+    else if(s.zeros>=3) st = '<span class="chip wn">'+s.zeros+' дня без продаж</span>';
+    else st = '<span class="chip ok">в работе</span>';
+    return `<tr><td class="sch">${s.name}</td><td class="op">${s.op}</td><td>${spark(s.sales)}</td>
+      <td class="num">${fmt(s.total)}</td><td class="num">${fmt(s.last)}</td><td>${st}</td></tr>`;
+  }).join('') : '<tr><td colspan="6" class="empty">Ничего не найдено</td></tr>';
+  document.getElementById('schNote').textContent = rows.length + ' из 43 школ' + (filterOp ? ' · ' + filterOp : '');
+}
+document.querySelectorAll('#schTable th[data-k]').forEach(th=> th.onclick = () => {
+  const k = th.dataset.k;
+  if(sortK===k) sortDir*=-1; else { sortK=k; sortDir = (k==='name'||k==='op') ? 1 : -1; }
+  renderCityTable();
+});
+document.getElementById('q').addEventListener('input', renderCityTable);
+document.getElementById('onlyf').addEventListener('change', renderCityTable);
+
+/* ===================== ГОРОД: готовность ===================== */
+const dot = v => v===true ? '<span class="dot ok">✓</span>' : v===false ? '<span class="dot no">✕</span>' : '<span class="dot na">—</span>';
+document.getElementById('ready').innerHTML = OPS.map(o=>{
+  const bad = o.schools.reduce((a,s)=>a+[s.hot1,s.hot2,s.buf1,s.buf2,s.sets,s.started].filter(v=>v===false).length,0);
+  const meta = [
+    '<span class="chip ok">доступы</span>',
+    '<span class="chip ok">обучение</span>',
+    `<span class="chip ${o.cashier_flag?'wn':'ok'}">кассиры: ${o.cashiers.replace(/^да\s*/i,'')}</span>`,
+    `<span class="chip ok">${o.assortment.replace(/^да\s*/i,'')}</span>`,
+    bad ? `<span class="chip no">пробелов: ${bad}</span>` : '<span class="chip ok">всё заведено</span>'
+  ].join('');
+  const rows = o.schools.map(s=>`<tr><td>${s.name}</td>
+    <td class="c">${dot(s.hot1)}</td><td class="c">${dot(s.hot2)}</td>
+    <td class="c">${dot(s.buf1)}</td><td class="c">${dot(s.buf2)}</td>
+    <td class="c">${dot(s.sets)}</td><td class="c">${dot(s.started)}</td></tr>`).join('');
+  return `<div class="opcard">
+    <div class="ophead"><span class="nm">${o.num}. ${o.name}</span><span class="mt">${o.schools.length} ${plural(o.schools.length,'школа','школы','школ')}</span></div>
+    <div class="opmeta">${meta}</div>
+    <div class="rgrid"><table><thead><tr><th>Школа</th><th>ГП К1</th><th>ГП К2</th><th>БУФ К1</th><th>БУФ К2</th><th>Компл.</th><th>Прод.</th></tr></thead><tbody>${rows}</tbody></table></div>
+  </div>`;
+}).join('');
+
+/* ===================== ГОРОД: проблемы ===================== */
+const noSales = SCHOOLS.filter(s=>s.total===0);
+const bufGaps = SCHOOLS.filter(s=>s.buf1===false||s.buf2===false);
+const hotGaps = SCHOOLS.filter(s=>s.hot1===false||s.hot2===false);
+const setGaps = SCHOOLS.filter(s=>s.sets===false);
+const zeroDays = SCHOOLS.filter(s=>s.zeros>=3 && s.total>0);
+const cashFlag = OPS.filter(o=>o.cashier_flag);
+const notes = OPS.filter(o=>o.issues || o.note);
+const cityItems = [];
+if(noSales.length) cityItems.push(['c','Продажи не начаты', `${noSales.length} ${plural(noSales.length,'школа','школы','школ')}: ${noSales.map(s=>s.name+' ('+s.op+')').join(', ')}. Меню буфета не заведено ни в одном корпусе, за ${D.length} дней — ноль транзакций.`]);
+if(bufGaps.length) cityItems.push(['c','Не заведено меню буфета', `${bufGaps.length} ${plural(bufGaps.length,'школа','школы','школ')}, хотя бы в одном корпусе:` + li(bufGaps.map(s=>s.name+' — '+s.op))]);
+if(hotGaps.length) cityItems.push(['c','Не заведено меню горячего питания', `${hotGaps.length} ${plural(hotGaps.length,'школа','школы','школ')}:` + li(hotGaps.map(s=>s.name+' — '+s.op))]);
+if(setGaps.length) cityItems.push(['w','Не составлены комплексы', setGaps.map(s=>s.name+' — '+s.op).join(', ')]);
+if(zeroDays.length) cityItems.push(['w','Продажи идут с перебоями', `${zeroDays.length} ${plural(zeroDays.length,'школа','школы','школ')} с тремя и более днями без транзакций:` + li(zeroDays.map(s=>s.name+' — '+s.zeros+' дн. из '+D.length+', '+fmt(s.total)+' транзакций за период'))]);
+if(cashFlag.length) cityItems.push(['w','Кассиров меньше, чем терминалов', cashFlag.map(o=>o.name+' ('+o.cashiers+')').join('; ') + '. Состав кассиров заведён не полностью.']);
+cityItems.push(['w','Наименования в комплектах', 'Повторяющееся замечание: не во всех комплектах прописано наименование позиции. Мешает разбору отчётов по комплексам.']);
+cityItems.push(['i','Замечания и примечания из мониторинга', notes.map(o=>`<div style="margin-top:8px"><b>${o.name}</b>${o.note?`<blockquote>${o.note.trim()}</blockquote>`:''}${o.issues?`<blockquote>${o.issues.trim()}</blockquote>`:''}</div>`).join('')]);
+document.getElementById('issues').innerHTML = cityItems.map(([sev,t,d])=>
+  `<div class="issue"><div class="sev ${sev}"></div><div class="body"><div class="t">${t}</div><div class="d">${d}</div></div></div>`).join('');
+document.getElementById('cityIssuesNote').textContent = 'По состоянию на ' + D[D.length-1];
+
+/* ===================== ОБЛАСТЬ ===================== */
+document.getElementById('oblSub').textContent =
+  `${O.n} ${plural(O.n,'школа','школы','школ')} · ${O.cities.length} ${plural(O.cities.length,'муниципалитет','муниципалитета','муниципалитетов')} · ${KSHP.length} ${plural(KSHP.length,'оператор','оператора','операторов')} питания · срез на ${OBL.date}`;
+
+document.getElementById('oblKpis').innerHTML = [
+  ['Привязано карт', fmt(O.cards), pct(O.cards,O.pupils)+' от '+fmt(O.pupils)+' учащихся', 'bad'],
+  ['ЛК родителей создано', fmt(O.parents), pct(O.parents,O.pupils)+' от числа учащихся', 'wn'],
+  ['Школы с активным меню', O.menu+' из '+O.n, (O.n-O.menu)+' '+plural(O.n-O.menu,'школа','школы','школ')+' без меню', (O.n-O.menu)?'wn':''],
+  ['СКУД подключён', O.skudConn+' из '+O.n, 'установлен в '+O.skudInst+', терминалов '+O.terminals, 'bad']
+].map(([l,v,n,c])=>`<div class="kpi"><div class="lab">${l}</div><div class="val">${v}</div><div class="note ${c}">${n}</div></div>`).join('');
+
+let filterCity = null;
+function renderOblCityBars(){
+  const max = CITIES[0].cards || 1;
+  document.getElementById('oblCityBars').innerHTML = CITIES.map(c=>`
+    <button class="bar" type="button" data-city="${c.city}" aria-pressed="${filterCity===c.city}">
+      <span class="nm">${c.city}<span style="color:var(--muted)"> · ${c.n} шк.</span></span>
+      <span class="track"><span class="fill" style="width:${(c.cards/max*100).toFixed(1)}%"></span></span>
+      <span class="v">${fmt(c.cards)} <small>${pct(c.cards,c.pupils)}</small></span>
+    </button>`).join('');
+  document.querySelectorAll('#oblCityBars .bar').forEach(b=> b.onclick = () => {
+    filterCity = filterCity === b.dataset.city ? null : b.dataset.city;
+    filterKshp = null;
+    renderOblCityBars(); renderKshp(); renderOblTable();
+    document.getElementById('oblTable').scrollIntoView({behavior:'smooth', block:'start'});
+  });
+}
+
+document.getElementById('oblMeters').innerHTML = [
+  ['Активное меню на текущую дату', O.menu, O.n, 'good'],
+  ['Оборудование СБС обновлено', O.sbs, O.n, 'warn'],
+  ['СКУД установлен', O.skudInst, O.n, 'warn'],
+  ['СКУД подключён', O.skudConn, O.n, 'bad'],
+  ['Школы с привязанными картами', O.n-O.noCards, O.n, 'warn'],
+  ['Школы с заявками на питание', O.withOrders, O.n, 'bad']
+].map(([l,v,t,c])=>`<div class="meter ${c}">
+    <div class="mtop"><span>${l}</span><b>${v} / ${t}</b></div>
+    <div class="track"><i style="width:${(100*v/t).toFixed(1)}%"></i></div>
+    <div class="cap">${pct(v,t)} школ области</div>
+  </div>`).join('');
+
+let filterKshp = null;
+function renderKshp(){
+  const src = filterCity ? OS.filter(r=>r.city===filterCity) : OS;
+  const agg = {};
+  src.forEach(r=>{
+    const a = agg[r.kshpShort] || (agg[r.kshpShort]={name:r.kshpShort,n:0,pupils:0,cards:0,menu:0,sbs:0,skud:0,orders:0});
+    a.n++; a.pupils+=r.pupils; a.cards+=r.cards;
+    a.menu += r.menu?1:0; a.sbs += r.sbs?1:0; a.skud += r.skudInst?1:0; a.orders += r.orders;
+  });
+  const rows = Object.values(agg).sort((a,b)=>b.n-a.n);
+  document.querySelector('#kshpTable tbody').innerHTML = rows.map(k=>`
+    <tr style="cursor:pointer" data-kshp="${k.name}">
+      <td class="sch">${k.name}${filterKshp===k.name?' <span class="chip na">фильтр</span>':''}</td>
+      <td class="num">${k.n}</td><td class="num">${fmt(k.pupils)}</td>
+      <td class="num">${fmt(k.cards)}</td><td class="num">${pct(k.cards,k.pupils)}</td>
+      <td><span class="chip ${k.menu===k.n?'ok':k.menu?'wn':'no'}">${k.menu}/${k.n}</span></td>
+      <td class="num">${k.sbs}</td><td class="num">${k.skud}</td><td class="num">${k.orders}</td>
+    </tr>`).join('');
+  document.querySelectorAll('#kshpTable tbody tr').forEach(tr=> tr.onclick = () => {
+    filterKshp = filterKshp === tr.dataset.kshp ? null : tr.dataset.kshp;
+    renderKshp(); renderOblTable();
+    document.getElementById('oblTable').scrollIntoView({behavior:'smooth', block:'start'});
+  });
+}
+
+let oSortK='cards', oSortDir=-1;
+function renderOblTable(){
+  const q = document.getElementById('oq').value.trim().toLowerCase();
+  const only = document.getElementById('oonly').value;
+  let rows = OS.slice();
+  if(filterCity) rows = rows.filter(r=>r.city===filterCity);
+  if(filterKshp) rows = rows.filter(r=>r.kshpShort===filterKshp);
+  if(q) rows = rows.filter(r=>(r.school+' '+r.city+' '+r.kshpShort).toLowerCase().includes(q));
+  if(only==='nocards') rows = rows.filter(r=>r.cards===0);
+  if(only==='nomenu') rows = rows.filter(r=>!r.menu);
+  if(only==='orders') rows = rows.filter(r=>r.orders>0);
+  if(only==='skud') rows = rows.filter(r=>r.skudInst);
+  rows.sort((a,b)=> (typeof a[oSortK]==='string' ? a[oSortK].localeCompare(b[oSortK],'ru') : a[oSortK]-b[oSortK]) * oSortDir);
+  document.querySelector('#oblTable tbody').innerHTML = rows.length ? rows.map(r=>{
+    const eq = [];
+    if(r.terminals) eq.push(`<span class="chip na">терм. ${r.terminals}</span>`);
+    if(r.sbs) eq.push('<span class="chip ok">СБС</span>');
+    if(r.skudConn) eq.push('<span class="chip ok">СКУД вкл.</span>');
+    else if(r.skudInst) eq.push('<span class="chip wn">СКУД уст.</span>');
+    return `<tr><td class="sch">${r.school}</td><td class="op">${r.city}</td><td class="op">${r.kshpShort}</td>
+      <td class="num">${fmt(r.pupils)}</td><td class="num">${fmt(r.cards)}</td>
+      <td class="num">${r.pupils?r.pct.toFixed(1).replace('.',','):'—'}</td>
+      <td class="num">${fmt(r.parents)}</td>
+      <td>${r.menu?'<span class="chip ok">есть</span>':'<span class="chip no">нет</span>'}</td>
+      <td>${eq.join(' ') || '<span class="chip na">—</span>'}</td></tr>`;
+  }).join('') : `<tr><td colspan="9" class="empty">Ничего не найдено</td></tr>`;
+  const f = [filterCity, filterKshp].filter(Boolean).join(' · ');
+  document.getElementById('oblSchNote').textContent = rows.length + ' из ' + O.n + ' школ' + (f ? ' · ' + f : '');
+}
+document.querySelectorAll('#oblTable th[data-k]').forEach(th=> th.onclick = () => {
+  const k = th.dataset.k;
+  if(oSortK===k) oSortDir*=-1; else { oSortK=k; oSortDir = (k==='school'||k==='city'||k==='kshpShort') ? 1 : -1; }
+  renderOblTable();
+});
+document.getElementById('oq').addEventListener('input', renderOblTable);
+document.getElementById('oonly').addEventListener('change', renderOblTable);
+
+/* ОБЛАСТЬ: проблемные зоны */
+const noMenuCities = CITIES.filter(c=>c.menu < c.n);
+const zeroCardSchools = OS.filter(r=>r.cards===0);
+const zeroCardCities = CITIES.filter(c=>c.cards===0);
+const lowCards = CITIES.filter(c=>c.cards>0 && c.cards/c.pupils < 0.03).sort((a,b)=>a.cards/a.pupils - b.cards/b.pupils);
+const oblItems = [
+  ['c','Карты почти не привязаны', `${fmt(O.cards)} карт на ${fmt(O.pupils)} учащихся — ${pct(O.cards,O.pupils)}. В ${O.noCards} школах из ${O.n} нет ни одной привязанной карты.` +
+     (zeroCardCities.length ? ' Полностью без карт: ' + zeroCardCities.map(c=>c.city).join(', ') + '.' : '') +
+     (lowCards.length ? li(lowCards.slice(0,6).map(c=>`${c.city} — ${c.cards} карт на ${fmt(c.pupils)} учащихся (${pct(c.cards,c.pupils)})`)) : '')],
+  ['c','СКУД фактически не работает', `Установлен в ${O.skudInst} школах из ${O.n}, подключён — в ${O.skudConn}. Данные Минобра. Терминалов питания установлено ${O.terminals}.`],
+  ['w','Школы без активного меню', `${O.n-O.menu} ${plural(O.n-O.menu,'школа','школы','школ')}:` + li(noMenuCities.map(c=>`${c.city} — ${c.n-c.menu} из ${c.n}`))],
+  ['w','Заявки на питание почти не подаются', `${fmt(O.orders)} заявок всего, только в ${O.withOrders} школах из ${O.n}. Меню заведено, но родители через систему не заказывают.`],
+  ['i','Что уже сделано', `Лицевые счета привязаны почти везде: ${fmt(O.ls)} ЛС — ${pct(O.ls,O.pupils)} от числа учащихся. Активных тарифов ${fmt(sum(OS,r=>r.tariffsActive))} из ${fmt(sum(OS,r=>r.tariffs))} заведённых, активных блюд в меню ${fmt(sum(OS,r=>r.dishes))}, комплексов ${fmt(sum(OS,r=>r.complexes))}. Узкое место — не настройка системы, а выдача и привязка карт.`]
+];
+document.getElementById('oblIssues').innerHTML = oblItems.map(([sev,t,d])=>
+  `<div class="issue"><div class="sev ${sev}"></div><div class="body"><div class="t">${t}</div><div class="d">${d}</div></div></div>`).join('');
+
+/* ===================== запуск ===================== */
+renderOpBars(); renderCityTable();
+renderOblCityBars(); renderKshp(); renderOblTable();
+const h = (location.hash||'').replace('#','');
+show(h==='city'||h==='oblast' ? h : 'start');
+let rz; addEventListener('resize', ()=>{ clearTimeout(rz); rz = setTimeout(drawLine, 180); });
+</script>
+
+</body>
+</html>
