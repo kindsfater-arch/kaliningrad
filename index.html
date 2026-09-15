@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Питание в школах Калининграда</title>
+<title>Карта школьника: город и область</title>
 <style>html{color-scheme:light dark}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <style>
@@ -12,7 +12,7 @@
   --page:#eff0f1; --surface:#fafbfb; --surface-2:#f4f5f6;
   --ink:#16181a; --ink-2:#4c5257; --muted:#7b8288;
   --line:#e0e2e4; --hair:#eaebed;
-  --accent:#3f6d91; --accent-soft:#dce6ee; --accent-ink:#2c5272;
+  --accent:#3f6d91; --accent-soft:#dce6ee; --accent-2:#8a6a4b;
   --good:#14762f; --good-bg:#e2efe4;
   --warn:#8a5a05; --warn-bg:#f6ecd9;
   --bad:#a32a2a; --bad-bg:#f6e2e2;
@@ -23,7 +23,7 @@
     --page:#121314; --surface:#1b1d1e; --surface-2:#222425;
     --ink:#f1f2f3; --ink-2:#c2c7cb; --muted:#8b9298;
     --line:#2c2f31; --hair:#26292b;
-    --accent:#79a8cb; --accent-soft:#25333f; --accent-ink:#9cc2dd;
+    --accent:#79a8cb; --accent-soft:#25333f; --accent-2:#c09a74;
     --good:#5bc178; --good-bg:#1d2c21;
     --warn:#d9a441; --warn-bg:#2e2718;
     --bad:#e07a7a; --bad-bg:#301d1d;
@@ -34,7 +34,7 @@
   --page:#121314; --surface:#1b1d1e; --surface-2:#222425;
   --ink:#f1f2f3; --ink-2:#c2c7cb; --muted:#8b9298;
   --line:#2c2f31; --hair:#26292b;
-  --accent:#79a8cb; --accent-soft:#25333f; --accent-ink:#9cc2dd;
+  --accent:#79a8cb; --accent-soft:#25333f; --accent-2:#c09a74;
   --good:#5bc178; --good-bg:#1d2c21;
   --warn:#d9a441; --warn-bg:#2e2718;
   --bad:#e07a7a; --bad-bg:#301d1d;
@@ -44,8 +44,7 @@
 body{
   background:var(--page); color:var(--ink);
   font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
-  font-size:15px; line-height:1.5; margin:0;
-  -webkit-text-size-adjust:100%;
+  font-size:15px; line-height:1.5; margin:0; -webkit-text-size-adjust:100%;
 }
 .wrap{max-width:1080px; margin:0 auto; padding-inline:16px; padding-block:24px 56px}
 h1,h2,h3{font-family:"Golos Text","IBM Plex Sans",system-ui,sans-serif; text-wrap:balance; margin:0}
@@ -55,58 +54,90 @@ h2{font-size:16px; font-weight:600; letter-spacing:-.005em}
 .sub{color:var(--ink-2); font-size:13.5px; margin-top:6px}
 header{border-bottom:1px solid var(--line); padding-bottom:18px; margin-bottom:20px}
 .hrow{display:flex; gap:12px; align-items:flex-start; justify-content:space-between; flex-wrap:wrap}
-.themebtn{
-  font:inherit; font-size:12px; color:var(--ink-2); background:var(--surface);
-  border:1px solid var(--line); border-radius:999px; padding:5px 12px; cursor:pointer;
-}
+.hbtns{display:flex; gap:8px; align-items:center}
+.themebtn{font:inherit; font-size:12px; color:var(--ink-2); background:var(--surface);
+  border:1px solid var(--line); border-radius:999px; padding:5px 12px; cursor:pointer}
 .themebtn:hover{color:var(--ink)}
 
-/* KPI */
+/* ---- стартовый экран ---- */
+.hero{padding-block:clamp(16px,6vw,54px)}
+.hero .eyebrow{display:block; margin-bottom:10px}
+.hero h1{font-size:clamp(26px,6.4vw,40px)}
+.hero .lede{color:var(--ink-2); font-size:clamp(14px,2.6vw,16px); margin-top:10px; max-width:56ch}
+.choices{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:clamp(20px,4vw,34px)}
+@media(max-width:700px){.choices{grid-template-columns:1fr}}
+.choice{
+  display:block; text-align:left; width:100%; font:inherit; color:inherit; cursor:pointer;
+  background:var(--surface); border:1px solid var(--line); border-radius:14px;
+  padding:20px 20px 18px; box-shadow:var(--shadow); transition:border-color .12s, transform .12s;
+}
+.choice:hover{border-color:var(--accent); transform:translateY(-1px)}
+.choice .ttl{font-family:"Golos Text",sans-serif; font-weight:600; font-size:19px; display:flex; align-items:baseline; justify-content:space-between; gap:10px}
+.choice .big, .choice .bigsub{display:block}
+.choice .ttl .arrow{color:var(--accent); font-size:15px}
+.choice .big{font-family:"Golos Text",sans-serif; font-size:clamp(26px,5.6vw,34px); font-weight:600; letter-spacing:-.02em; margin-top:14px; line-height:1.1}
+.choice .bigsub{font-size:12.5px; color:var(--muted); margin-top:2px}
+.choice ul{margin:14px 0 0; padding:0; list-style:none; border-top:1px solid var(--hair); padding-top:12px; display:grid; gap:5px}
+.choice li{font-size:12.5px; color:var(--ink-2); display:flex; justify-content:space-between; gap:10px}
+.choice li b{font-weight:600; font-variant-numeric:tabular-nums}
+.startfoot{margin-top:22px; font-size:12px; color:var(--muted)}
+
+.backbtn{font:inherit; font-size:12.5px; color:var(--ink-2); background:none; border:0; padding:4px 0; cursor:pointer; display:inline-flex; gap:6px; align-items:center}
+.backbtn:hover{color:var(--accent)}
+
+/* ---- KPI ---- */
 .kpis{display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:22px}
 @media(max-width:720px){.kpis{grid-template-columns:repeat(2,1fr)}}
 .kpi{background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:13px 14px; box-shadow:var(--shadow)}
 .kpi .lab{font-size:11.5px; color:var(--muted); letter-spacing:.02em}
 .kpi .val{font-family:"Golos Text",system-ui,sans-serif; font-size:clamp(20px,4.6vw,26px); font-weight:600; letter-spacing:-.02em; margin-top:3px; line-height:1.15}
 .kpi .note{font-size:11.5px; color:var(--ink-2); margin-top:4px}
-.kpi .note.up{color:var(--good)}
-.kpi .note.bad{color:var(--bad)}
+.kpi .note.up{color:var(--good)} .kpi .note.bad{color:var(--bad)} .kpi .note.wn{color:var(--warn)}
 
 section{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px; margin-bottom:14px; box-shadow:var(--shadow)}
 .shead{display:flex; align-items:baseline; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-bottom:12px}
 .shead p{margin:0; font-size:12.5px; color:var(--muted)}
-
-/* filter bar */
 .filters{display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:14px}
-select,input[type=search]{
-  font:inherit; font-size:13px; color:var(--ink); background:var(--surface);
-  border:1px solid var(--line); border-radius:8px; padding:7px 10px; min-width:0;
-}
+select,input[type=search]{font:inherit; font-size:13px; color:var(--ink); background:var(--surface);
+  border:1px solid var(--line); border-radius:8px; padding:7px 10px; min-width:0}
 input[type=search]{flex:1 1 150px}
-select:focus-visible,input:focus-visible,button:focus-visible,tr:focus-visible{outline:2px solid var(--accent); outline-offset:1px}
+select:focus-visible,input:focus-visible,button:focus-visible{outline:2px solid var(--accent); outline-offset:1px}
 
-/* charts */
+/* ---- charts ---- */
 .chartbox{position:relative}
 svg{display:block; width:100%; height:auto; max-width:100%}
-.tt{
-  position:absolute; pointer-events:none; z-index:5; background:var(--surface);
+.tt{position:absolute; pointer-events:none; z-index:5; background:var(--surface);
   border:1px solid var(--line); border-radius:8px; padding:7px 9px; font-size:12px;
-  box-shadow:0 4px 14px rgba(20,24,28,.12); white-space:nowrap; opacity:0; transition:opacity .1s;
-}
+  box-shadow:0 4px 14px rgba(20,24,28,.12); white-space:nowrap; opacity:0; transition:opacity .1s}
 .tt b{font-family:"Golos Text",sans-serif; font-weight:600}
 .tt .m{color:var(--muted)}
 
-/* bars */
+/* ---- bars ---- */
 .bars{display:flex; flex-direction:column; gap:7px}
-.bar{display:grid; grid-template-columns:minmax(96px,150px) 1fr auto; gap:10px; align-items:center; cursor:pointer; border:0; background:none; padding:3px 4px; border-radius:7px; text-align:left; font:inherit; color:inherit; width:100%}
+.bar{display:grid; grid-template-columns:minmax(96px,160px) 1fr auto; gap:10px; align-items:center; cursor:pointer;
+  border:0; background:none; padding:3px 4px; border-radius:7px; text-align:left; font:inherit; color:inherit; width:100%}
 .bar:hover{background:var(--surface-2)}
 .bar[aria-pressed=true]{background:var(--accent-soft)}
+.bar.static{cursor:default}
+.bar.static:hover{background:none}
 .bar .nm{font-size:12.5px; color:var(--ink-2); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
 .bar .track{display:block; height:16px; background:var(--hair); border-radius:3px; overflow:hidden}
 .bar .fill{display:block; height:100%; min-width:3px; background:var(--accent); border-radius:0 4px 4px 0}
-.bar .v{font-size:12.5px; font-variant-numeric:tabular-nums; color:var(--ink); min-width:68px; text-align:right}
+.bar .v{font-size:12.5px; font-variant-numeric:tabular-nums; color:var(--ink); min-width:74px; text-align:right}
+.bar .v small{color:var(--muted); font-size:11.5px}
 @media(max-width:520px){.bar{grid-template-columns:1fr; gap:3px} .bar .v{text-align:left;min-width:0} .bar .nm{white-space:normal}}
 
-/* table */
+/* ---- meters ---- */
+.meters{display:grid; grid-template-columns:repeat(2,1fr); gap:14px 20px}
+@media(max-width:620px){.meters{grid-template-columns:1fr}}
+.meter .mtop{display:flex; justify-content:space-between; align-items:baseline; gap:10px; font-size:13px; margin-bottom:5px}
+.meter .mtop b{font-family:"Golos Text",sans-serif; font-weight:600; font-variant-numeric:tabular-nums}
+.meter .track{height:8px; background:var(--hair); border-radius:4px; overflow:hidden}
+.meter .track i{display:block; height:100%; border-radius:4px; background:var(--accent)}
+.meter.good .track i{background:var(--good)} .meter.warn .track i{background:var(--warn)} .meter.bad .track i{background:var(--bad)}
+.meter .cap{font-size:11.5px; color:var(--muted); margin-top:4px}
+
+/* ---- table ---- */
 .tblwrap{overflow-x:auto; margin:0 -4px}
 table{border-collapse:collapse; width:100%; font-size:13px}
 th,td{padding:7px 8px; text-align:left; border-bottom:1px solid var(--hair); vertical-align:middle}
@@ -115,16 +146,14 @@ th.num,td.num{text-align:right; font-variant-numeric:tabular-nums}
 tbody tr:hover{background:var(--surface-2)}
 td.sch{font-weight:500}
 td.op{color:var(--muted); font-size:12px}
-.spark{width:76px; height:20px}
+.spark{width:82px; height:20px}
 
-/* chips */
 .chip{display:inline-flex; align-items:center; gap:4px; font-size:11.5px; padding:2px 7px; border-radius:999px; white-space:nowrap; font-weight:500}
 .chip.ok{background:var(--good-bg); color:var(--good)}
 .chip.no{background:var(--bad-bg); color:var(--bad)}
 .chip.wn{background:var(--warn-bg); color:var(--warn)}
 .chip.na{background:var(--surface-2); color:var(--muted)}
 
-/* readiness */
 .opcard{border:1px solid var(--line); border-radius:10px; padding:12px; margin-bottom:10px; background:var(--surface)}
 .ophead{display:flex; justify-content:space-between; align-items:baseline; gap:10px; flex-wrap:wrap; margin-bottom:9px}
 .ophead .nm{font-family:"Golos Text",sans-serif; font-weight:600; font-size:14.5px}
@@ -139,7 +168,6 @@ td.op{color:var(--muted); font-size:12px}
 .dot.no{background:var(--bad-bg); color:var(--bad)}
 .dot.na{background:var(--surface-2); color:var(--muted)}
 
-/* issues */
 .issue{display:flex; gap:10px; padding:11px 0; border-bottom:1px solid var(--hair)}
 .issue:last-child{border-bottom:0}
 .sev{width:3px; border-radius:2px; flex:0 0 3px}
@@ -160,128 +188,287 @@ footer{color:var(--muted); font-size:11.5px; margin-top:18px; text-align:center}
 
 
 <div class="wrap">
-<header>
-  <div class="hrow">
-    <div>
-      <div class="eyebrow">Карта школьника · городской контур</div>
-      <h1>Операторы питания: готовность и продажи</h1>
-      <div class="sub">12 операторов · 43 школы · учебные дни 2–11 сентября 2026 · 1 транзакция = 150 ₽</div>
+
+<!-- ============ СТАРТ ============ -->
+<div id="screen-start">
+  <div class="hrow" style="justify-content:flex-end"><button class="themebtn" id="theme0" type="button">Тема</button></div>
+  <div class="hero">
+    <span class="eyebrow">Карта школьника · Калининградская область</span>
+    <h1>Школьное питание: два контура</h1>
+    <p class="lede">Город работает в боевом режиме — продажи идут с 2 сентября. Область на стадии подключения: карты, меню и оборудование. Выберите контур.</p>
+    <div class="choices" id="choices"></div>
+    <p class="startfoot" id="startfoot"></p>
+  </div>
+</div>
+
+<!-- ============ ГОРОД ============ -->
+<div id="screen-city" hidden>
+  <header>
+    <div class="hrow">
+      <div>
+        <button class="backbtn" data-back>← Выбор контура</button>
+        <div class="eyebrow" style="margin-top:6px">Город Калининград · городской контур</div>
+        <h1>Операторы питания: готовность и продажи</h1>
+        <div class="sub" id="citySub"></div>
+      </div>
+      <div class="hbtns"><button class="themebtn" data-goto="oblast" type="button">Область →</button><button class="themebtn" data-theme-toggle type="button">Тема</button></div>
     </div>
-    <button class="themebtn" id="theme" type="button">Тема</button>
-  </div>
-</header>
+  </header>
 
-<div class="kpis" id="kpis"></div>
+  <div class="kpis" id="cityKpis"></div>
 
-<section>
-  <div class="shead">
-    <h2>Транзакции по дням</h2>
-    <p id="dynNote"></p>
-  </div>
-  <div class="chartbox" id="lineBox"></div>
-  <div class="legend"><span>Количество транзакций рассчитано из оборотов по среднему чеку 150 ₽, округление до целого по каждому дню</span></div>
-</section>
+  <section>
+    <div class="shead"><h2>Транзакции по дням</h2><p id="dynNote"></p></div>
+    <div class="chartbox" id="lineBox"></div>
+    <div class="legend"><span>Количество транзакций рассчитано из оборотов по среднему чеку 150 ₽, округление до целого по каждому дню</span></div>
+  </section>
 
-<section>
-  <div class="shead">
-    <h2>Операторы</h2>
-    <p>Нажмите на оператора — фильтруются график и таблица</p>
-  </div>
-  <div class="bars" id="opBars"></div>
-</section>
+  <section>
+    <div class="shead"><h2>Операторы</h2><p>Нажмите на оператора — фильтруются график и таблица</p></div>
+    <div class="bars" id="opBars"></div>
+  </section>
 
-<section>
-  <div class="shead">
-    <h2>Школы</h2>
-    <p id="schNote"></p>
-  </div>
-  <div class="filters">
-    <input type="search" id="q" placeholder="Поиск по школе или оператору" aria-label="Поиск">
-    <select id="onlyf" aria-label="Фильтр">
-      <option value="all">Все школы</option>
-      <option value="zero">С нулевыми днями</option>
-      <option value="gaps">С незаполненными данными</option>
-    </select>
-  </div>
-  <div class="tblwrap">
-    <table id="schTable">
-      <thead><tr>
-        <th data-k="name">Школа</th>
-        <th data-k="op">Оператор</th>
-        <th>Динамика</th>
-        <th class="num" data-k="total">Транзакций</th>
-        <th class="num" data-k="last">11.09</th>
-        <th>Статус</th>
-      </tr></thead>
-      <tbody></tbody>
-    </table>
-  </div>
-</section>
+  <section>
+    <div class="shead"><h2>Школы</h2><p id="schNote"></p></div>
+    <div class="filters">
+      <input type="search" id="q" placeholder="Поиск по школе или оператору" aria-label="Поиск">
+      <select id="onlyf" aria-label="Фильтр">
+        <option value="all">Все школы</option>
+        <option value="zero">С нулевыми днями</option>
+        <option value="gaps">С незаполненными данными</option>
+      </select>
+    </div>
+    <div class="tblwrap">
+      <table id="schTable">
+        <thead><tr>
+          <th data-k="name">Школа</th><th data-k="op">Оператор</th><th>Динамика</th>
+          <th class="num" data-k="total">Транзакций</th><th class="num" data-k="last">Последний день</th><th>Статус</th>
+        </tr></thead><tbody></tbody>
+      </table>
+    </div>
+  </section>
 
-<section>
-  <div class="shead">
-    <h2>Готовность по корпусам</h2>
-    <p>ГП — меню горячего питания, БУФ — меню буфета, К1/К2 — корпуса</p>
-  </div>
-  <div id="ready"></div>
-  <div class="legend">
-    <span><span class="dot ok">✓</span> заведено</span>
-    <span><span class="dot no">✕</span> не заведено</span>
-    <span><span class="dot na">—</span> корпуса нет</span>
-  </div>
-</section>
+  <section>
+    <div class="shead"><h2>Готовность по корпусам</h2><p>ГП — меню горячего питания, БУФ — меню буфета, К1/К2 — корпуса</p></div>
+    <div id="ready"></div>
+    <div class="legend">
+      <span><span class="dot ok">✓</span> заведено</span>
+      <span><span class="dot no">✕</span> не заведено</span>
+      <span><span class="dot na">—</span> корпуса нет</span>
+    </div>
+  </section>
 
-<section>
-  <div class="shead"><h2>Проблемные зоны</h2><p>По состоянию на 11.09</p></div>
-  <div id="issues"></div>
-</section>
+  <section>
+    <div class="shead"><h2>Проблемные зоны</h2><p id="cityIssuesNote"></p></div>
+    <div id="issues"></div>
+  </section>
+</div>
 
-<footer>Источник: файл «Операторы питания», обороты пересчитаны в транзакции по 150 ₽. Дашборд собран 14.09.2026.</footer>
+<!-- ============ ОБЛАСТЬ ============ -->
+<div id="screen-oblast" hidden>
+  <header>
+    <div class="hrow">
+      <div>
+        <button class="backbtn" data-back>← Выбор контура</button>
+        <div class="eyebrow" style="margin-top:6px">Калининградская область · муниципальный контур</div>
+        <h1>Подключение школ: карты, меню, оборудование</h1>
+        <div class="sub" id="oblSub"></div>
+      </div>
+      <div class="hbtns"><button class="themebtn" data-goto="city" type="button">← Город</button><button class="themebtn" data-theme-toggle type="button">Тема</button></div>
+    </div>
+  </header>
+
+  <div class="kpis" id="oblKpis"></div>
+
+  <section>
+    <div class="shead"><h2>Привязка карт по муниципалитетам</h2><p>Нажмите на муниципалитет — фильтруется таблица школ</p></div>
+    <div class="bars" id="oblCityBars"></div>
+    <div class="legend"><span>Справа — привязанных карт и доля от числа учащихся</span></div>
+  </section>
+
+  <section>
+    <div class="shead"><h2>Готовность питания</h2><p>Доля школ области, по данным на 14.09</p></div>
+    <div class="meters" id="oblMeters"></div>
+  </section>
+
+  <section>
+    <div class="shead"><h2>Операторы питания области</h2><p>7 КШП · нажмите для фильтрации таблицы</p></div>
+    <div class="tblwrap">
+      <table id="kshpTable">
+        <thead><tr>
+          <th>Оператор (КШП)</th><th class="num">Школ</th><th class="num">Учащихся</th>
+          <th class="num">Карт</th><th class="num">% карт</th><th>Меню</th><th class="num">СБС</th><th class="num">СКУД</th><th class="num">Заявок</th>
+        </tr></thead><tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="shead"><h2>Школы области</h2><p id="oblSchNote"></p></div>
+    <div class="filters">
+      <input type="search" id="oq" placeholder="Поиск по школе, муниципалитету, оператору" aria-label="Поиск">
+      <select id="oonly" aria-label="Фильтр">
+        <option value="all">Все школы</option>
+        <option value="nocards">Без привязанных карт</option>
+        <option value="nomenu">Без активного меню</option>
+        <option value="orders">С заявками на питание</option>
+        <option value="skud">Со СКУД</option>
+      </select>
+    </div>
+    <div class="tblwrap">
+      <table id="oblTable">
+        <thead><tr>
+          <th data-k="school">Школа</th><th data-k="city">Муниципалитет</th><th data-k="kshpShort">Оператор</th>
+          <th class="num" data-k="pupils">Уч-ся</th><th class="num" data-k="cards">Карт</th><th class="num" data-k="pct">%</th>
+          <th class="num" data-k="parents">ЛК</th><th>Меню</th><th>Оборудование</th>
+        </tr></thead><tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="shead"><h2>Проблемные зоны</h2><p>По состоянию на 14.09.2026</p></div>
+    <div id="oblIssues"></div>
+  </section>
+</div>
+
+<footer id="foot"></footer>
 </div>
 
 <script>
-const DATA = {"dates":["02.09","03.09","04.09","07.09","08.09","09.09","10.09","11.09"],"operators":[{"num":1,"name":"ООО «Аппетит»","cashiers":"да 24 шт","assortment":"да 686 позиций","cashier_flag":null,"note":"","added":"","issues":"","schools":[{"name":"МАОУ СОШ № 24","hot1":true,"hot2":null,"buf1":false,"buf2":null,"sets":true,"started":true,"sales":[0,0,23,15,39,35,40,43]},{"name":"МАОУ СОШ № 26","hot1":true,"hot2":null,"buf1":true,"buf2":null,"sets":true,"started":true,"sales":[0,1,51,20,112,110,77,86]},{"name":"МАОУ СОШ № 33","hot1":true,"hot2":true,"buf1":true,"buf2":false,"sets":true,"started":true,"sales":[0,10,234,275,293,270,260,152]},{"name":"МАОУ СОШ № 38","hot1":true,"hot2":true,"buf1":true,"buf2":true,"sets":true,"started":true,"sales":[60,121,171,153,176,126,142,262]},{"name":"МАОУ СОШ № 43","hot1":true,"hot2":null,"buf1":true,"buf2":null,"sets":true,"started":true,"sales":[0,0,6,61,19,87,67,77]},{"name":"МАОУ СОШ №9 им. Дьякова П.М.","hot1":true,"hot2":true,"buf1":false,"buf2":false,"sets":true,"started":false,"sales":[0,0,0,0,0,0,0,0]},{"name":"МАОУ гимназия № 1","hot1":true,"hot2":true,"buf1":true,"buf2":false,"sets":true,"started":true,"sales":[0,26,141,55,22,85,49,74]},{"name":"МАОУ гимназия № 22","hot1":true,"hot2":true,"buf1":true,"buf2":false,"sets":true,"started":true,"sales":[0,19,361,399,369,481,532,680]},{"name":"МАОУ лицей 35","hot1":true,"hot2":null,"buf1":true,"buf2":null,"sets":true,"started":true,"sales":[94,106,0,74,87,100,82,114]}]},{"num":2,"name":"ООО «Гарант-Питание»","cashiers":"Да 15 шт","assortment":"Да 84 позиций","cashier_flag":null,"note":"Ошибки в меню. Наример в 25 и 2 школе меню буфета и  линии горячего питания идентично и содержит буфетную продукцию.","added":"04.09 - +1\n07.09 - +2\n08.09 - +1","issues":"2.09 меню горячего питания было, а 3.09 не заведено, почему? Продажи только в буфетах.\n11.09 не во всех комплектах прописано наименование","schools":[{"name":"МАОУ СОШ № 13","hot1":true,"hot2":null,"buf1":true,"buf2":null,"sets":true,"started":true,"sales":[0,0,3,11,10,7,11,16]},{"name":"МАОУ СОШ № 2","hot1":true,"hot2":null,"buf1":true,"buf2":null,"sets":true,"started":true,"sales":[0,0,0,15,7,0,11,15]},{"name":"МАОУ СОШ № 25 с УИОП","hot1":true,"hot2":null,"buf1":true,"buf2":null,"sets":true,"started":true,"sales":[0,0,0,0,1,0,13,19]},{"name":"МАОУ СОШ № 57","hot1":true,"hot2":true,"buf1":true,"buf2":true,"sets":true,"started":true,"sales":[0,0,5,54,122,47,42,40]},{"name":"МАОУ гимназия № 32","hot1":true,"hot2":true,"buf1":true,"buf2":true,"sets":true,"started":true,"sales":[0,0,18,11,10,13,12,10]}]},{"num":3,"name":"ООО «Эсперанто»","cashiers":"да 14 шт","assortment":"да 68 позиций","cashier_flag":null,"note":"Молодцы, сразу делают свои фото блюд.\nРазобраться с комплекстами и отдельными блюдами горячего итания.","added":"04.09 - +4","issues":"07.09 не заполнено меню горячего питания, а также не исправлена ошибка с комплектами, почему? \n09.09 в комплектах не прописано наименование","schools":[{"name":"МАОУ СОШ № 19","hot1":false,"hot2":false,"buf1":true,"buf2":true,"sets":true,"started":true,"sales":[0,0,11,7,14,10,19,10]},{"name":"МАОУ СОШ № 21","hot1":true,"hot2":null,"buf1":true,"buf2":null,"sets":true,"started":true,"sales":[0,21,16,19,26,22,17,20]},{"name":"МАОУ СОШ № 29","hot1":true,"hot2":false,"buf1":true,"buf2":true,"sets":true,"started":true,"sales":[0,0,3,30,39,45,42,45]},{"name":"МАОУ СОШ № 31","hot1":true,"hot2":null,"buf1":true,"buf2":null,"sets":true,"started":true,"sales":[0,0,3,45,30,45,35,41]},{"name":"МАОУ СОШ № 4","hot1":true,"hot2":null,"buf1":true,"buf2":null,"sets":false,"started":true,"sales":[4,18,20,28,21,21,18,14]},{"name":"МАОУ лицей № 17","hot1":true,"hot2":null,"buf1":true,"buf2":null,"sets":true,"started":true,"sales":[28,19,73,36,33,39,37,37]}]},{"num":4,"name":"ООО «Соколов»","cashiers":"да 31 шт","assortment":"да 380 позиций","cashier_flag":null,"note":"Ошибка - комплексы добавлены в товарный ассортимент, а не собраны в меню в разделе \"комплексы\". Гипотетически так можно, но лучше у тех.поддержки получить консультацию по правильному формированию комплексов. Если это не сделать, то будут несостыковки в отчетах. Во всех школах меню и на линии горячего питания и в буфете идентичное - это не правильно.","added":"04.09 - +5\n07.09 - +2","issues":"09.09 в комплектах не прописано наименование","schools":[{"name":"МАОУ СОШ 28","hot1":true,"hot2":true,"buf1":true,"buf2":true,"sets":true,"started":true,"sales":[0,272,269,320,429,549,544,484]},{"name":"МАОУ СОШ 3","hot1":true,"hot2":true,"buf1":true,"buf2":false,"sets":true,"started":true,"sales":[0,0,156,223,186,219,237,212]},{"name":"МАОУ СОШ № 11","hot1":true,"hot2":true,"buf1":false,"buf2":true,"sets":true,"started":true,"sales":[0,3,56,233,246,243,174,262]},{"name":"МАОУ СОШ № 46 с УИОП","hot1":true,"hot2":true,"buf1":true,"buf2":true,"sets":true,"started":true,"sales":[7,18,13,31,86,124,121,153]},{"name":"МАОУ СОШ № 48","hot1":true,"hot2":null,"buf1":true,"buf2":null,"sets":true,"started":true,"sales":[0,6,115,263,270,112,235,229]},{"name":"МАОУ СОШ № 5","hot1":true,"hot2":null,"buf1":true,"buf2":null,"sets":true,"started":true,"sales":[0,0,0,7,0,25,61,59]},{"name":"МАОУ СОШ №12","hot1":true,"hot2":true,"buf1":true,"buf2":false,"sets":true,"started":true,"sales":[0,1,14,32,28,27,38,91]},{"name":"МАОУ лицей № 18","hot1":true,"hot2":false,"buf1":true,"buf2":false,"sets":true,"started":true,"sales":[0,1,9,5,21,11,11,33]}]},{"num":5,"name":"ООО «Каравай»","cashiers":"да 13 шт","assortment":"да 740 позиций","cashier_flag":null,"note":"Комплекты заведены корректно в 58 школе, остальные с ошибками.","added":"04.09 - +3","issues":"07.09 не во всех комплектах прописано наименование","schools":[{"name":"МАОУ СОШ № 10","hot1":true,"hot2":true,"buf1":true,"buf2":true,"sets":true,"started":true,"sales":[0,44,20,148,23,18,30,15]},{"name":"МАОУ СОШ № 50","hot1":true,"hot2":true,"buf1":true,"buf2":true,"sets":true,"started":true,"sales":[0,22,325,436,417,431,421,362]},{"name":"МАОУ СОШ № 58","hot1":true,"hot2":true,"buf1":true,"buf2":true,"sets":true,"started":true,"sales":[306,588,583,594,642,645,564,562]},{"name":"МАОУ СОШ № 7","hot1":true,"hot2":null,"buf1":true,"buf2":null,"sets":true,"started":true,"sales":[0,27,184,225,217,140,135,121]}]},{"num":6,"name":"ООО «Русский пир»","cashiers":"да 6 шт","assortment":"да 672 позиций","cashier_flag":"кассиров меньше, чем терминалов","note":"Терминалов в школах больше чем кассиров - не олностью состав кассиров заведен?","added":"04.09 - +2\n07.09 - +1","issues":"07.09 не во всех комплектах прописано наименование","schools":[{"name":"МАОУ ООШ № 15","hot1":true,"hot2":true,"buf1":true,"buf2":true,"sets":true,"started":true,"sales":[0,0,0,34,52,41,42,36]},{"name":"МАОУ СОШ № 8","hot1":true,"hot2":null,"buf1":true,"buf2":null,"sets":true,"started":true,"sales":[0,0,5,6,7,7,38,31]},{"name":"МАОУ СОШ №14","hot1":true,"hot2":null,"buf1":true,"buf2":null,"sets":true,"started":true,"sales":[0,13,126,175,160,156,171,138]}]},{"num":7,"name":"ООО «Штум»","cashiers":"да 5 шт","assortment":"да 149 позиций","cashier_flag":"кассиров меньше, чем терминалов","note":"Терминалов в школах больше чем кассиров - не олностью состав кассиров заведен? Обратить внимание на комлексы - собраны, возможно, не правильно. Обратиться в теходдержку за консультацией по воросу формирования комлексов.","added":"04.09 - +2","issues":"09.09 не во всех комплектах прописано наименование","schools":[{"name":"МАОУ СОШ № 47","hot1":true,"hot2":null,"buf1":true,"buf2":null,"sets":true,"started":true,"sales":[0,1,6,54,46,16,53,56]},{"name":"МАОУ лицей № 23","hot1":true,"hot2":null,"buf1":true,"buf2":null,"sets":true,"started":true,"sales":[0,64,158,157,184,253,158,134]}]},{"num":8,"name":"ИП Дараган Людмила Юрьевна","cashiers":"да 3 шт","assortment":"да 42 позиций","cashier_flag":null,"note":"","added":"04.09 - +1","issues":"","schools":[{"name":"МАОУ СОШ № 44","hot1":true,"hot2":null,"buf1":true,"buf2":null,"sets":true,"started":true,"sales":[0,1,19,11,20,15,0,23]}]},{"num":9,"name":"ООО «Функция»","cashiers":"да 9 шт","assortment":"да 265 позиций","cashier_flag":null,"note":"","added":"04.09 - +1","issues":"09.09 в комплекте не прописано наименование","schools":[{"name":"МАОУ гимназия № 40 им. Ю.А.Гагарина","hot1":true,"hot2":true,"buf1":true,"buf2":true,"sets":true,"started":true,"sales":[0,49,2,53,66,57,47,47]}]},{"num":10,"name":"ИП Мадиссон  Светлана Владимировна","cashiers":"да 6 шт","assortment":"да 162 позиций","cashier_flag":null,"note":"","added":"04.09 - +1","issues":"10.09 не во всех комплектах прописано наименование","schools":[{"name":"МАОУ СОШ № 56","hot1":true,"hot2":true,"buf1":true,"buf2":true,"sets":true,"started":true,"sales":[4,0,61,53,136,98,100,113]},{"name":"МАОУ СОШ № 6 с УИОП","hot1":true,"hot2":null,"buf1":true,"buf2":null,"sets":true,"started":true,"sales":[0,0,1,236,253,380,381,401]}]},{"num":11,"name":"ИП Рыбина Валентина Григорьевна","cashiers":"да 2 шт","assortment":"да 718 позиций","cashier_flag":null,"note":"Обратить внимание на комлексы - собраны, возможно, не правильно. Обратиться в теходдержку за консультацией по воросу формирования комлексов.","added":"07.09 - +1","issues":"","schools":[{"name":"МАОУ СОШ № 36","hot1":true,"hot2":null,"buf1":true,"buf2":null,"sets":true,"started":true,"sales":[0,0,0,0,4,27,52,34]}]},{"num":12,"name":"ООО «Энола»","cashiers":"да 3 шт","assortment":"да 710 позиций","cashier_flag":null,"note":"","added":"","issues":"07.09 в корпусе 2 не прописан буфет\n09.09 в комплекте не прописано наименование","schools":[{"name":"МАОУ лицей № 49","hot1":true,"hot2":true,"buf1":true,"buf2":false,"sets":true,"started":true,"sales":[14,16,23,64,132,142,199,242]}]}]};
-const D = DATA.dates, OPS = DATA.operators;
-const SCHOOLS = [];
-OPS.forEach(o => o.schools.forEach(s => SCHOOLS.push(Object.assign({op:o.name, opNum:o.num}, s))));
-SCHOOLS.forEach(s => { s.total = s.sales.reduce((a,b)=>a+b,0); s.last = s.sales[s.sales.length-1];
-  s.zeros = s.sales.filter(v=>v===0).length;
-  s.gaps = [s.hot1,s.hot2,s.buf1,s.buf2,s.sets,s.started].filter(v=>v===false).length; });
+const DATA = {"city":{"dates":["02.09","03.09","04.09","07.09","08.09","09.09","10.09","11.09","14.09"],"operators":[{"num":1,"name":"ООО «Аппетит»","cashiers":"да 24 шт","assortment":"да 686 позиций","cashier_flag":null,"note":"","added":"","issues":"","schools":[{"name":"МАОУ СОШ № 24","hot1":true,"hot2":null,"buf1":false,"buf2":null,"sets":true,"started":true,"sales":[0,0,23,15,39,35,40,43,38]},{"name":"МАОУ СОШ № 26","hot1":true,"hot2":null,"buf1":true,"buf2":null,"sets":true,"started":true,"sales":[0,1,51,20,112,110,77,86,93]},{"name":"МАОУ СОШ № 33","hot1":true,"hot2":false,"buf1":true,"buf2":true,"sets":true,"started":true,"sales":[0,10,234,275,293,270,260,152,218]},{"name":"МАОУ СОШ № 38","hot1":true,"hot2":true,"buf1":true,"buf2":true,"sets":true,"started":true,"sales":[60,121,171,153,176,126,142,262,233]},{"name":"МАОУ СОШ № 43","hot1":true,"hot2":null,"buf1":true,"buf2":null,"sets":true,"started":true,"sales":[0,0,6,61,19,87,67,77,71]},{"name":"МАОУ СОШ №9 им. Дьякова П.М.","hot1":true,"hot2":true,"buf1":true,"buf2":false,"sets":true,"started":true,"sales":[0,0,0,0,0,0,0,0,16]},{"name":"МАОУ гимназия № 1","hot1":true,"hot2":true,"buf1":true,"buf2":false,"sets":true,"started":true,"sales":[0,26,141,55,22,85,49,74,71]},{"name":"МАОУ гимназия № 22","hot1":true,"hot2":true,"buf1":true,"buf2":false,"sets":true,"started":true,"sales":[0,19,361,399,369,481,532,680,544]},{"name":"МАОУ лицей 35","hot1":true,"hot2":null,"buf1":true,"buf2":null,"sets":true,"started":true,"sales":[94,106,0,74,87,100,82,114,101]}]},{"num":2,"name":"ООО «Гарант-Питание»","cashiers":"Да 15 шт","assortment":"Да 84 позиций","cashier_flag":null,"note":"Ошибки в меню. Наример в 25 и 2 школе меню буфета и  линии горячего питания идентично и содержит буфетную продукцию.","added":"04.09 - +1\n07.09 - +2\n08.09 - +1","issues":"2.09 меню горячего питания было, а 3.09 не заведено, почему? Продажи только в буфетах.\n11.09 не во всех комплектах прописано наименование","schools":[{"name":"МАОУ СОШ № 13","hot1":true,"hot2":null,"buf1":true,"buf2":null,"sets":true,"started":true,"sales":[0,0,3,11,10,7,11,16,10]},{"name":"МАОУ СОШ № 2","hot1":true,"hot2":null,"buf1":true,"buf2":null,"sets":true,"started":true,"sales":[0,0,0,15,7,0,11,15,12]},{"name":"МАОУ СОШ № 25 с УИОП","hot1":true,"hot2":null,"buf1":true,"buf2":null,"sets":true,"started":true,"sales":[0,0,0,0,1,0,13,19,12]},{"name":"МАОУ СОШ № 57","hot1":true,"hot2":true,"buf1":true,"buf2":true,"sets":true,"started":true,"sales":[0,0,5,54,122,47,42,40,52]},{"name":"МАОУ гимназия № 32","hot1":false,"hot2":true,"buf1":true,"buf2":true,"sets":true,"started":true,"sales":[0,0,18,11,10,13,12,10,17]}]},{"num":3,"name":"ООО «Эсперанто»","cashiers":"да 14 шт","assortment":"да 68 позиций","cashier_flag":null,"note":"Молодцы, сразу делают свои фото блюд.\nРазобраться с комплекстами и отдельными блюдами горячего итания.","added":"04.09 - +4","issues":"07.09 не заполнено меню горячего питания, а также не исправлена ошибка с комплектами, почему? \n09.09 в комплектах не прописано наименование","schools":[{"name":"МАОУ СОШ № 19","hot1":false,"hot2":false,"buf1":true,"buf2":true,"sets":true,"started":true,"sales":[0,0,11,7,14,10,19,10,4]},{"name":"МАОУ СОШ № 21","hot1":true,"hot2":null,"buf1":true,"buf2":null,"sets":true,"started":true,"sales":[0,21,16,19,26,22,17,20,27]},{"name":"МАОУ СОШ № 29","hot1":true,"hot2":false,"buf1":true,"buf2":true,"sets":true,"started":true,"sales":[0,0,3,30,39,45,42,45,38]},{"name":"МАОУ СОШ № 31","hot1":true,"hot2":null,"buf1":true,"buf2":null,"sets":true,"started":true,"sales":[0,0,3,45,30,45,35,41,48]},{"name":"МАОУ СОШ № 4","hot1":true,"hot2":null,"buf1":true,"buf2":null,"sets":false,"started":true,"sales":[4,18,20,28,21,21,18,14,13]},{"name":"МАОУ лицей № 17","hot1":true,"hot2":null,"buf1":true,"buf2":null,"sets":true,"started":true,"sales":[28,19,73,36,33,39,37,37,40]}]},{"num":4,"name":"ООО «Соколов»","cashiers":"да 31 шт","assortment":"да 380 позиций","cashier_flag":null,"note":"Ошибка - комплексы добавлены в товарный ассортимент, а не собраны в меню в разделе \"комплексы\". Гипотетически так можно, но лучше у тех.поддержки получить консультацию по правильному формированию комплексов. Если это не сделать, то будут несостыковки в отчетах. Во всех школах меню и на линии горячего питания и в буфете идентичное - это не правильно.","added":"04.09 - +5\n07.09 - +2","issues":"09.09 в комплектах не прописано наименование","schools":[{"name":"МАОУ СОШ 28","hot1":true,"hot2":true,"buf1":true,"buf2":true,"sets":true,"started":true,"sales":[0,272,269,320,429,549,544,484,507]},{"name":"МАОУ СОШ 3","hot1":true,"hot2":true,"buf1":true,"buf2":false,"sets":true,"started":true,"sales":[0,0,156,223,186,219,237,212,260]},{"name":"МАОУ СОШ № 11","hot1":true,"hot2":true,"buf1":false,"buf2":true,"sets":true,"started":true,"sales":[0,3,56,233,246,243,174,262,237]},{"name":"МАОУ СОШ № 46 с УИОП","hot1":true,"hot2":true,"buf1":true,"buf2":true,"sets":true,"started":true,"sales":[7,18,13,31,86,124,121,153,182]},{"name":"МАОУ СОШ № 48","hot1":true,"hot2":null,"buf1":true,"buf2":null,"sets":true,"started":true,"sales":[0,6,115,263,270,112,235,229,293]},{"name":"МАОУ СОШ № 5","hot1":true,"hot2":null,"buf1":true,"buf2":null,"sets":true,"started":true,"sales":[0,0,0,7,0,25,61,59,81]},{"name":"МАОУ СОШ №12","hot1":true,"hot2":true,"buf1":true,"buf2":false,"sets":true,"started":true,"sales":[0,1,14,32,28,27,38,91,74]},{"name":"МАОУ лицей № 18","hot1":true,"hot2":false,"buf1":true,"buf2":false,"sets":true,"started":true,"sales":[0,1,9,5,21,11,11,33,48]}]},{"num":5,"name":"ООО «Каравай»","cashiers":"да 13 шт","assortment":"да 740 позиций","cashier_flag":null,"note":"Комплекты заведены корректно в 58 школе, остальные с ошибками.","added":"04.09 - +3","issues":"07.09 не во всех комплектах прописано наименование","schools":[{"name":"МАОУ СОШ № 10","hot1":true,"hot2":true,"buf1":true,"buf2":true,"sets":true,"started":true,"sales":[0,44,20,148,23,18,30,15,9]},{"name":"МАОУ СОШ № 50","hot1":true,"hot2":true,"buf1":true,"buf2":true,"sets":true,"started":true,"sales":[0,22,325,436,417,431,421,362,418]},{"name":"МАОУ СОШ № 58","hot1":true,"hot2":true,"buf1":true,"buf2":true,"sets":true,"started":true,"sales":[306,588,583,594,642,645,564,562,552]},{"name":"МАОУ СОШ № 7","hot1":true,"hot2":null,"buf1":true,"buf2":null,"sets":true,"started":true,"sales":[0,27,184,225,217,140,135,121,253]}]},{"num":6,"name":"ООО «Русский пир»","cashiers":"да 6 шт","assortment":"да 672 позиций","cashier_flag":"кассиров меньше, чем терминалов","note":"Терминалов в школах больше чем кассиров - не олностью состав кассиров заведен?","added":"04.09 - +2\n07.09 - +1","issues":"07.09 не во всех комплектах прописано наименование","schools":[{"name":"МАОУ ООШ № 15","hot1":true,"hot2":true,"buf1":true,"buf2":true,"sets":true,"started":true,"sales":[0,0,0,34,52,41,42,36,6]},{"name":"МАОУ СОШ № 8","hot1":true,"hot2":null,"buf1":true,"buf2":null,"sets":true,"started":true,"sales":[0,0,5,6,7,7,38,31,47]},{"name":"МАОУ СОШ №14","hot1":true,"hot2":null,"buf1":true,"buf2":null,"sets":true,"started":true,"sales":[0,13,126,175,160,156,171,138,74]}]},{"num":7,"name":"ООО «Штум»","cashiers":"да 5 шт","assortment":"да 149 позиций","cashier_flag":"кассиров меньше, чем терминалов","note":"Терминалов в школах больше чем кассиров - не олностью состав кассиров заведен? Обратить внимание на комлексы - собраны, возможно, не правильно. Обратиться в теходдержку за консультацией по воросу формирования комлексов.","added":"04.09 - +2","issues":"09.09 не во всех комплектах прописано наименование","schools":[{"name":"МАОУ СОШ № 47","hot1":true,"hot2":null,"buf1":true,"buf2":null,"sets":true,"started":true,"sales":[0,1,6,54,46,16,53,56,29]},{"name":"МАОУ лицей № 23","hot1":true,"hot2":null,"buf1":true,"buf2":null,"sets":true,"started":true,"sales":[0,64,158,157,184,253,158,134,92]}]},{"num":8,"name":"ИП Дараган Людмила Юрьевна","cashiers":"да 3 шт","assortment":"да 42 позиций","cashier_flag":null,"note":"","added":"04.09 - +1","issues":"","schools":[{"name":"МАОУ СОШ № 44","hot1":true,"hot2":null,"buf1":true,"buf2":null,"sets":true,"started":true,"sales":[0,1,19,11,20,15,0,23,0]}]},{"num":9,"name":"ООО «Функция»","cashiers":"да 9 шт","assortment":"да 265 позиций","cashier_flag":null,"note":"","added":"04.09 - +1","issues":"09.09 в комплекте не прописано наименование","schools":[{"name":"МАОУ гимназия № 40 им. Ю.А.Гагарина","hot1":true,"hot2":true,"buf1":true,"buf2":true,"sets":true,"started":true,"sales":[0,49,2,53,66,57,47,47,58]}]},{"num":10,"name":"ИП Мадиссон  Светлана Владимировна","cashiers":"да 6 шт","assortment":"да 162 позиций","cashier_flag":null,"note":"","added":"04.09 - +1","issues":"10.09 не во всех комплектах прописано наименование","schools":[{"name":"МАОУ СОШ № 56","hot1":true,"hot2":true,"buf1":true,"buf2":true,"sets":true,"started":true,"sales":[4,0,61,53,136,98,100,113,319]},{"name":"МАОУ СОШ № 6 с УИОП","hot1":true,"hot2":null,"buf1":true,"buf2":null,"sets":true,"started":true,"sales":[0,0,1,236,253,380,381,401,359]}]},{"num":11,"name":"ИП Рыбина Валентина Григорьевна","cashiers":"да 2 шт","assortment":"да 718 позиций","cashier_flag":null,"note":"Обратить внимание на комлексы - собраны, возможно, не правильно. Обратиться в теходдержку за консультацией по воросу формирования комлексов.","added":"07.09 - +1","issues":"","schools":[{"name":"МАОУ СОШ № 36","hot1":true,"hot2":null,"buf1":true,"buf2":null,"sets":true,"started":true,"sales":[0,0,0,0,4,27,52,34,51]}]},{"num":12,"name":"ООО «Энола»","cashiers":"да 3 шт","assortment":"да 710 позиций","cashier_flag":null,"note":"","added":"","issues":"07.09 в корпусе 2 не прописан буфет\n09.09 в комплекте не прописано наименование","schools":[{"name":"МАОУ лицей № 49","hot1":true,"hot2":true,"buf1":true,"buf2":false,"sets":true,"started":true,"sales":[14,16,23,64,132,142,199,242,227]}]}]},"oblast":{"date":"14.09.2026","schools":[{"city":"Багратионовск","school":"МБОУ Начальная Школа - Детский Сад П.Партизанское","pupils":55,"ls":55,"cards":5,"parents":22,"tariffs":2,"tariffsActive":0,"lsTariff":0,"menu":true,"complexes":11,"dishes":250,"orders":0,"sbs":false,"terminals":1,"skudInst":false,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Багратионовск","school":"МБОУ \"СОШ им. А. Антошечкина\"","pupils":337,"ls":337,"cards":0,"parents":0,"tariffs":14,"tariffsActive":0,"lsTariff":139,"menu":true,"complexes":11,"dishes":250,"orders":0,"sbs":false,"terminals":1,"skudInst":false,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Багратионовск","school":"МБОУ \"СОШ П. Корнево\"","pupils":171,"ls":179,"cards":50,"parents":59,"tariffs":9,"tariffsActive":9,"lsTariff":0,"menu":true,"complexes":11,"dishes":250,"orders":0,"sbs":false,"terminals":1,"skudInst":true,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Багратионовск","school":"МБОУ \"СОШ П. Нивенское\"","pupils":500,"ls":326,"cards":0,"parents":0,"tariffs":19,"tariffsActive":2,"lsTariff":325,"menu":true,"complexes":11,"dishes":250,"orders":0,"sbs":false,"terminals":1,"skudInst":false,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Багратионовск","school":"МБОУ \" СОШ П. Пятидорожное\"","pupils":358,"ls":184,"cards":1,"parents":0,"tariffs":0,"tariffsActive":0,"lsTariff":0,"menu":true,"complexes":11,"dishes":250,"orders":0,"sbs":false,"terminals":1,"skudInst":false,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Багратионовск","school":"МБОУ \"СОШ П. Тишино\"","pupils":115,"ls":117,"cards":1,"parents":7,"tariffs":20,"tariffsActive":8,"lsTariff":88,"menu":true,"complexes":11,"dishes":250,"orders":0,"sbs":false,"terminals":1,"skudInst":true,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Багратионовск","school":"МБОУ \"Средняя Школа Города Багратионовска\"","pupils":779,"ls":774,"cards":1,"parents":0,"tariffs":9,"tariffsActive":9,"lsTariff":411,"menu":true,"complexes":11,"dishes":250,"orders":0,"sbs":false,"terminals":1,"skudInst":true,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Багратионовск","school":"МБОУ \"Южная СОШ\"","pupils":568,"ls":326,"cards":0,"parents":0,"tariffs":2,"tariffsActive":0,"lsTariff":36,"menu":true,"complexes":11,"dishes":250,"orders":0,"sbs":false,"terminals":1,"skudInst":false,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Балтийск","school":"МБОУ Гимназия № 7","pupils":813,"ls":824,"cards":8,"parents":36,"tariffs":0,"tariffsActive":0,"lsTariff":0,"menu":true,"complexes":7,"dishes":127,"orders":0,"sbs":true,"terminals":1,"skudInst":false,"skudConn":false,"kshpShort":"МИТПРОДТОРГ"},{"city":"Балтийск","school":"МБОУ лицей №1 города Балтийска","pupils":591,"ls":652,"cards":6,"parents":26,"tariffs":8,"tariffsActive":7,"lsTariff":296,"menu":true,"complexes":7,"dishes":127,"orders":0,"sbs":true,"terminals":1,"skudInst":true,"skudConn":false,"kshpShort":"МИТПРОДТОРГ"},{"city":"Балтийск","school":"МБОУ СОШ №4 им. В.Н.Носова","pupils":767,"ls":1134,"cards":205,"parents":63,"tariffs":9,"tariffsActive":9,"lsTariff":370,"menu":true,"complexes":7,"dishes":127,"orders":0,"sbs":true,"terminals":1,"skudInst":true,"skudConn":true,"kshpShort":"МИТПРОДТОРГ"},{"city":"Балтийск","school":"МБОУ СОШ № 5","pupils":482,"ls":482,"cards":9,"parents":10,"tariffs":11,"tariffsActive":1,"lsTariff":284,"menu":true,"complexes":6,"dishes":256,"orders":0,"sbs":true,"terminals":1,"skudInst":true,"skudConn":false,"kshpShort":"МИТПРОДТОРГ"},{"city":"Гвардейск","school":"МБОУ \"ОШ им. Н.Тимошенко пос. Красный Яр\"","pupils":86,"ls":92,"cards":3,"parents":37,"tariffs":9,"tariffsActive":9,"lsTariff":53,"menu":false,"complexes":0,"dishes":0,"orders":0,"sbs":false,"terminals":0,"skudInst":false,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Гвардейск","school":"МБОУ \"ОШ пос. Зорино\"","pupils":97,"ls":39,"cards":0,"parents":0,"tariffs":0,"tariffsActive":0,"lsTariff":0,"menu":false,"complexes":0,"dishes":0,"orders":0,"sbs":false,"terminals":0,"skudInst":false,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Гвардейск","school":"МБОУ \"ОШ пос. Комсомольска\"","pupils":146,"ls":147,"cards":38,"parents":55,"tariffs":17,"tariffsActive":9,"lsTariff":128,"menu":false,"complexes":0,"dishes":0,"orders":0,"sbs":false,"terminals":0,"skudInst":false,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Гвардейск","school":"МБОУ \"СШ №1 им. И.Прокопенко гор. Гвардейска\"","pupils":651,"ls":320,"cards":5,"parents":25,"tariffs":0,"tariffsActive":0,"lsTariff":0,"menu":false,"complexes":0,"dishes":0,"orders":0,"sbs":true,"terminals":1,"skudInst":false,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Гвардейск","school":"МБОУ \"СШ № 2 им. А. Круталевича гор.Гвардейска\"","pupils":746,"ls":362,"cards":1,"parents":0,"tariffs":0,"tariffsActive":0,"lsTariff":0,"menu":false,"complexes":0,"dishes":0,"orders":0,"sbs":true,"terminals":1,"skudInst":false,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Гвардейск","school":"МБОУ \"СШ им. А. Лохматова пос. Озерки\"","pupils":257,"ls":245,"cards":0,"parents":0,"tariffs":1,"tariffsActive":1,"lsTariff":0,"menu":false,"complexes":0,"dishes":0,"orders":0,"sbs":false,"terminals":0,"skudInst":false,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Гвардейск","school":"МБОУ \"СШ им. А. Моисеева пос. Знаменска\"","pupils":516,"ls":514,"cards":6,"parents":0,"tariffs":16,"tariffsActive":16,"lsTariff":180,"menu":false,"complexes":0,"dishes":0,"orders":0,"sbs":false,"terminals":0,"skudInst":false,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Гвардейск","school":"МБОУ \"СШ им. Д. Сидорова пос. Славинска\"","pupils":86,"ls":88,"cards":0,"parents":0,"tariffs":6,"tariffsActive":6,"lsTariff":0,"menu":false,"complexes":0,"dishes":0,"orders":0,"sbs":true,"terminals":1,"skudInst":false,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Гвардейск","school":"МБОУ \"СШ пос. Борское\"","pupils":213,"ls":211,"cards":1,"parents":114,"tariffs":9,"tariffsActive":9,"lsTariff":150,"menu":false,"complexes":0,"dishes":0,"orders":0,"sbs":false,"terminals":0,"skudInst":true,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Гурьевск","school":"МБОУ Гимназия им. Героя РФ А.В.Катериничева","pupils":1825,"ls":0,"cards":0,"parents":0,"tariffs":0,"tariffsActive":0,"lsTariff":0,"menu":true,"complexes":6,"dishes":291,"orders":0,"sbs":true,"terminals":4,"skudInst":false,"skudConn":false,"kshpShort":"Школьное питание"},{"city":"Гурьевск","school":"МБОУ \"Добринская ООШ\" (Тростники)","pupils":236,"ls":406,"cards":3,"parents":0,"tariffs":0,"tariffsActive":0,"lsTariff":0,"menu":true,"complexes":6,"dishes":291,"orders":0,"sbs":true,"terminals":1,"skudInst":false,"skudConn":false,"kshpShort":"Школьное питание"},{"city":"Гурьевск","school":"МБОУ \"Добринская ООШ\" (Константиновка)","pupils":240,"ls":0,"cards":0,"parents":0,"tariffs":0,"tariffsActive":0,"lsTariff":0,"menu":false,"complexes":0,"dishes":0,"orders":0,"sbs":true,"terminals":1,"skudInst":false,"skudConn":false,"kshpShort":"Школьное питание"},{"city":"Гурьевск","school":"МБОУ \"Классическая Школа\" Г. Гурьевска","pupils":1609,"ls":959,"cards":35,"parents":233,"tariffs":0,"tariffsActive":0,"lsTariff":0,"menu":true,"complexes":6,"dishes":291,"orders":0,"sbs":true,"terminals":3,"skudInst":true,"skudConn":false,"kshpShort":"Школьное питание"},{"city":"Гурьевск","school":"МБОУ \"Низовская СОШ\"","pupils":718,"ls":872,"cards":158,"parents":389,"tariffs":1,"tariffsActive":1,"lsTariff":29,"menu":true,"complexes":6,"dishes":291,"orders":0,"sbs":true,"terminals":1,"skudInst":false,"skudConn":false,"kshpShort":"Школьное питание"},{"city":"Гурьевск","school":"МБОУ \"Орловская ООШ\"","pupils":267,"ls":269,"cards":7,"parents":0,"tariffs":4,"tariffsActive":4,"lsTariff":0,"menu":true,"complexes":6,"dishes":291,"orders":0,"sbs":true,"terminals":1,"skudInst":true,"skudConn":false,"kshpShort":"Школьное питание"},{"city":"Гурьевск","school":"МБОУ \"Петровская СОШ им.П.А.Захарова\"","pupils":299,"ls":293,"cards":0,"parents":0,"tariffs":3,"tariffsActive":3,"lsTariff":0,"menu":true,"complexes":6,"dishes":291,"orders":0,"sbs":true,"terminals":1,"skudInst":true,"skudConn":false,"kshpShort":"Школьное питание"},{"city":"Гурьевск","school":"МБОУ \"СОШ № 1\" Г. Гурьевска","pupils":981,"ls":982,"cards":23,"parents":136,"tariffs":0,"tariffsActive":0,"lsTariff":0,"menu":true,"complexes":6,"dishes":291,"orders":0,"sbs":true,"terminals":1,"skudInst":true,"skudConn":false,"kshpShort":"Школьное питание"},{"city":"Гурьевск","school":"МБОУ \"СОШ П. Васильково\"","pupils":809,"ls":824,"cards":10,"parents":2,"tariffs":0,"tariffsActive":0,"lsTariff":0,"menu":true,"complexes":6,"dishes":291,"orders":0,"sbs":true,"terminals":1,"skudInst":true,"skudConn":false,"kshpShort":"Школьное питание"},{"city":"Гурьевск","school":"МБОУ СОШ \"Школа Будущего\"","pupils":3321,"ls":1305,"cards":12,"parents":84,"tariffs":1,"tariffsActive":1,"lsTariff":9,"menu":true,"complexes":6,"dishes":291,"orders":0,"sbs":true,"terminals":4,"skudInst":true,"skudConn":false,"kshpShort":"Школьное питание"},{"city":"Гурьевск","school":"МБОУ \"Храбровская СОШ\"","pupils":918,"ls":1075,"cards":23,"parents":102,"tariffs":3,"tariffsActive":0,"lsTariff":0,"menu":true,"complexes":6,"dishes":291,"orders":0,"sbs":true,"terminals":1,"skudInst":true,"skudConn":false,"kshpShort":"Школьное питание"},{"city":"Гурьевск","school":"МБОУ \"Яблоневская ООШ\"","pupils":401,"ls":453,"cards":2,"parents":0,"tariffs":10,"tariffsActive":10,"lsTariff":271,"menu":true,"complexes":6,"dishes":291,"orders":0,"sbs":false,"terminals":0,"skudInst":true,"skudConn":false,"kshpShort":"Школьное питание"},{"city":"Гусев","school":"МАОУ \"СОШ №3 им.Героя РФ В.С. Паламарчука","pupils":1057,"ls":938,"cards":24,"parents":531,"tariffs":15,"tariffsActive":8,"lsTariff":644,"menu":true,"complexes":11,"dishes":250,"orders":0,"sbs":false,"terminals":2,"skudInst":true,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Гусев","school":"МОУ \"СОШ №1 им. С.И. Гусева\" (2 к. - младший)","pupils":1374,"ls":619,"cards":13,"parents":97,"tariffs":0,"tariffsActive":0,"lsTariff":0,"menu":true,"complexes":11,"dishes":250,"orders":0,"sbs":false,"terminals":1,"skudInst":true,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Гусев","school":"МОУ \"СОШ №1 им. С.И. Гусева\" (к. 1 - старший)","pupils":0,"ls":406,"cards":12,"parents":43,"tariffs":12,"tariffsActive":8,"lsTariff":14,"menu":true,"complexes":11,"dishes":250,"orders":0,"sbs":false,"terminals":1,"skudInst":true,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Гусев","school":"МОУ \"СОШ №1 им. С.И. Гусева\" (пос. Маяковское)","pupils":0,"ls":85,"cards":0,"parents":8,"tariffs":14,"tariffsActive":3,"lsTariff":14,"menu":true,"complexes":11,"dishes":250,"orders":0,"sbs":false,"terminals":1,"skudInst":true,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Гусев","school":"МОУ \"СОШ №5\"","pupils":719,"ls":600,"cards":6,"parents":80,"tariffs":10,"tariffsActive":10,"lsTariff":1,"menu":true,"complexes":11,"dishes":250,"orders":0,"sbs":false,"terminals":1,"skudInst":true,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Гусев","school":"Филиал МАОУ «СОШ № 3 им. Героя РФ В.С. Паламарчука","pupils":0,"ls":77,"cards":4,"parents":32,"tariffs":19,"tariffsActive":9,"lsTariff":87,"menu":true,"complexes":11,"dishes":250,"orders":0,"sbs":false,"terminals":1,"skudInst":true,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Гусев","school":"Филиал МОУ \"СОШ № 5\" \"СОШ в п. Михайлово\"","pupils":0,"ls":114,"cards":0,"parents":0,"tariffs":8,"tariffsActive":8,"lsTariff":0,"menu":true,"complexes":11,"dishes":250,"orders":0,"sbs":false,"terminals":1,"skudInst":true,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Зеленоградск","school":"МАОУ \"Гимназия \"Вектор\" Г. Зеленоградска\"","pupils":1040,"ls":1098,"cards":30,"parents":59,"tariffs":21,"tariffsActive":18,"lsTariff":619,"menu":true,"complexes":2,"dishes":100,"orders":0,"sbs":true,"terminals":1,"skudInst":false,"skudConn":false,"kshpShort":"УРА"},{"city":"Зеленоградск","school":"МАОУ ООШ п.Грачевка","pupils":265,"ls":267,"cards":21,"parents":60,"tariffs":11,"tariffsActive":11,"lsTariff":178,"menu":true,"complexes":2,"dishes":100,"orders":0,"sbs":true,"terminals":1,"skudInst":false,"skudConn":false,"kshpShort":"УРА"},{"city":"Зеленоградск","school":"МАОУ ООШ п.Кострово","pupils":88,"ls":69,"cards":0,"parents":0,"tariffs":5,"tariffsActive":5,"lsTariff":46,"menu":true,"complexes":2,"dishes":100,"orders":0,"sbs":true,"terminals":1,"skudInst":false,"skudConn":false,"kshpShort":"УРА"},{"city":"Зеленоградск","school":"МАОУ ООШ п. Мельниково","pupils":218,"ls":224,"cards":9,"parents":67,"tariffs":17,"tariffsActive":9,"lsTariff":5,"menu":true,"complexes":2,"dishes":100,"orders":0,"sbs":false,"terminals":1,"skudInst":false,"skudConn":false,"kshpShort":"УРА"},{"city":"Зеленоградск","school":"МАОУ СОШ г.Зеленоградска","pupils":1141,"ls":802,"cards":26,"parents":38,"tariffs":10,"tariffsActive":8,"lsTariff":595,"menu":true,"complexes":1,"dishes":8,"orders":0,"sbs":true,"terminals":2,"skudInst":false,"skudConn":false,"kshpShort":"БАЛТИЙСКИЙ БРИЗ"},{"city":"Зеленоградск","school":"МАОУ СОШ п. Переславское","pupils":617,"ls":624,"cards":173,"parents":1,"tariffs":18,"tariffsActive":18,"lsTariff":421,"menu":true,"complexes":2,"dishes":100,"orders":0,"sbs":true,"terminals":1,"skudInst":false,"skudConn":false,"kshpShort":"УРА"},{"city":"Зеленоградск","school":"МАОУ СОШ п.Романово","pupils":246,"ls":318,"cards":154,"parents":69,"tariffs":1,"tariffsActive":1,"lsTariff":0,"menu":true,"complexes":2,"dishes":100,"orders":0,"sbs":true,"terminals":1,"skudInst":false,"skudConn":false,"kshpShort":"УРА"},{"city":"Зеленоградск","school":"МАОУ СОШ п.Рыбачий","pupils":36,"ls":38,"cards":0,"parents":0,"tariffs":0,"tariffsActive":0,"lsTariff":0,"menu":true,"complexes":2,"dishes":100,"orders":0,"sbs":true,"terminals":1,"skudInst":false,"skudConn":false,"kshpShort":"УРА"},{"city":"Краснознаменск","school":"МАОУ \"СОШ №1 Г. Краснознаменска\"","pupils":641,"ls":527,"cards":0,"parents":0,"tariffs":0,"tariffsActive":0,"lsTariff":0,"menu":false,"complexes":0,"dishes":0,"orders":0,"sbs":false,"terminals":0,"skudInst":false,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Краснознаменск","school":"МБОУ СОШ №4 П. Добровольск","pupils":222,"ls":234,"cards":0,"parents":28,"tariffs":9,"tariffsActive":9,"lsTariff":0,"menu":false,"complexes":0,"dishes":0,"orders":0,"sbs":false,"terminals":0,"skudInst":false,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Ладушкин","school":"МБОУ СОШ МО \"Ладушкинский городской округ\"","pupils":461,"ls":444,"cards":8,"parents":32,"tariffs":13,"tariffsActive":13,"lsTariff":0,"menu":true,"complexes":5,"dishes":10,"orders":0,"sbs":false,"terminals":0,"skudInst":false,"skudConn":false,"kshpShort":"Индивидуальный предприниматель Дараган Л"},{"city":"Мамоново","school":"МБОУ СОШ г. Мамоново","pupils":770,"ls":621,"cards":38,"parents":273,"tariffs":16,"tariffsActive":7,"lsTariff":481,"menu":true,"complexes":5,"dishes":10,"orders":1,"sbs":false,"terminals":0,"skudInst":false,"skudConn":false,"kshpShort":"Индивидуальный предприниматель Дараган Л"},{"city":"Мамоново","school":"МБОУ СОШ г. Мамоново (мл.корпус)","pupils":0,"ls":294,"cards":17,"parents":39,"tariffs":10,"tariffsActive":5,"lsTariff":1026,"menu":true,"complexes":5,"dishes":10,"orders":0,"sbs":false,"terminals":0,"skudInst":false,"skudConn":false,"kshpShort":"Индивидуальный предприниматель Дараган Л"},{"city":"Неман","school":"МАОУ \"СОШ №1 Г.Немана\"","pupils":746,"ls":733,"cards":16,"parents":0,"tariffs":0,"tariffsActive":0,"lsTariff":0,"menu":true,"complexes":11,"dishes":250,"orders":0,"sbs":false,"terminals":0,"skudInst":false,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Неман","school":"МАОУ \"СОШ №2 Г. Немана\"","pupils":390,"ls":369,"cards":126,"parents":109,"tariffs":11,"tariffsActive":11,"lsTariff":0,"menu":false,"complexes":0,"dishes":0,"orders":0,"sbs":false,"terminals":0,"skudInst":false,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Неман","school":"МАОУ \"Ульяновская СОШ\"","pupils":124,"ls":129,"cards":0,"parents":0,"tariffs":0,"tariffsActive":0,"lsTariff":0,"menu":true,"complexes":11,"dishes":250,"orders":0,"sbs":true,"terminals":1,"skudInst":false,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Неман","school":"МБОУ СОШ П.Жилино","pupils":126,"ls":124,"cards":0,"parents":0,"tariffs":7,"tariffsActive":7,"lsTariff":0,"menu":true,"complexes":11,"dishes":250,"orders":0,"sbs":false,"terminals":0,"skudInst":false,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Неман","school":"МБОУ \"СОШ Пос. Новоколхозное\"","pupils":104,"ls":105,"cards":1,"parents":27,"tariffs":9,"tariffsActive":8,"lsTariff":13,"menu":true,"complexes":11,"dishes":250,"orders":0,"sbs":false,"terminals":0,"skudInst":false,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Нестеров","school":"МАОУ \"Заветинская НШ-ДС\"","pupils":16,"ls":23,"cards":0,"parents":2,"tariffs":2,"tariffsActive":0,"lsTariff":0,"menu":true,"complexes":11,"dishes":250,"orders":0,"sbs":false,"terminals":0,"skudInst":false,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Нестеров","school":"МАОУ Замковская СОШ","pupils":201,"ls":203,"cards":7,"parents":102,"tariffs":8,"tariffsActive":8,"lsTariff":0,"menu":true,"complexes":11,"dishes":250,"orders":0,"sbs":false,"terminals":0,"skudInst":false,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Нестеров","school":"МАОУ Илюшинская СОШ","pupils":152,"ls":155,"cards":1,"parents":42,"tariffs":9,"tariffsActive":9,"lsTariff":118,"menu":true,"complexes":11,"dishes":250,"orders":0,"sbs":false,"terminals":0,"skudInst":false,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Нестеров","school":"МАОУ Побединская СОШ","pupils":109,"ls":118,"cards":9,"parents":62,"tariffs":18,"tariffsActive":9,"lsTariff":87,"menu":true,"complexes":11,"dishes":250,"orders":0,"sbs":false,"terminals":0,"skudInst":false,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Нестеров","school":"МАОУ СОШ Г. Нестерова имени В.И. Пацаева","pupils":546,"ls":550,"cards":3,"parents":271,"tariffs":9,"tariffsActive":9,"lsTariff":346,"menu":true,"complexes":11,"dishes":250,"orders":0,"sbs":false,"terminals":0,"skudInst":false,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Озерск","school":"Гавриловская Средняя Школа им.Г.Крысанова","pupils":113,"ls":113,"cards":50,"parents":27,"tariffs":8,"tariffsActive":8,"lsTariff":92,"menu":true,"complexes":11,"dishes":250,"orders":0,"sbs":false,"terminals":0,"skudInst":false,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Озерск","school":"МАОУ ООШ П.Ново-Гурьевское","pupils":148,"ls":148,"cards":90,"parents":29,"tariffs":20,"tariffsActive":11,"lsTariff":170,"menu":true,"complexes":11,"dishes":250,"orders":0,"sbs":false,"terminals":0,"skudInst":false,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Озерск","school":"МАОУ ООШ П.Ушаково","pupils":120,"ls":111,"cards":40,"parents":0,"tariffs":16,"tariffsActive":16,"lsTariff":45,"menu":true,"complexes":11,"dishes":250,"orders":0,"sbs":false,"terminals":0,"skudInst":false,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Озерск","school":"Новостроевская Средняя Школа","pupils":270,"ls":275,"cards":143,"parents":72,"tariffs":0,"tariffsActive":0,"lsTariff":0,"menu":true,"complexes":11,"dishes":250,"orders":0,"sbs":false,"terminals":0,"skudInst":false,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Озерск","school":"Озёрская Средняя Школа им.Д.Тарасова","pupils":444,"ls":439,"cards":7,"parents":63,"tariffs":18,"tariffsActive":9,"lsTariff":344,"menu":true,"complexes":11,"dishes":250,"orders":0,"sbs":false,"terminals":0,"skudInst":false,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Пионерский","school":"МБОУ СОШ г. Пионерского","pupils":1428,"ls":1469,"cards":58,"parents":26,"tariffs":21,"tariffsActive":13,"lsTariff":118,"menu":true,"complexes":6,"dishes":256,"orders":0,"sbs":true,"terminals":2,"skudInst":false,"skudConn":false,"kshpShort":"МИТПРОДТОРГ"},{"city":"Полесск","school":"МАОУ \"Полесская СОШ\"","pupils":1001,"ls":1001,"cards":10,"parents":88,"tariffs":35,"tariffsActive":13,"lsTariff":695,"menu":true,"complexes":6,"dishes":259,"orders":0,"sbs":true,"terminals":2,"skudInst":false,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Полесск","school":"МАОУ \"Славянская ООШ\"","pupils":231,"ls":233,"cards":2,"parents":80,"tariffs":3,"tariffsActive":3,"lsTariff":75,"menu":false,"complexes":0,"dishes":0,"orders":0,"sbs":true,"terminals":1,"skudInst":false,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Полесск","school":"МБОУ \"Залесовская СОШ\"","pupils":219,"ls":220,"cards":60,"parents":27,"tariffs":9,"tariffsActive":9,"lsTariff":13,"menu":false,"complexes":0,"dishes":0,"orders":0,"sbs":true,"terminals":1,"skudInst":false,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Полесск","school":"МБОУ \"Саранская ООШ\"","pupils":150,"ls":149,"cards":0,"parents":0,"tariffs":1,"tariffsActive":1,"lsTariff":0,"menu":false,"complexes":0,"dishes":0,"orders":0,"sbs":true,"terminals":1,"skudInst":false,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Полесск","school":"МБОУ \"Сосновская ООШ\"","pupils":98,"ls":104,"cards":0,"parents":0,"tariffs":9,"tariffsActive":9,"lsTariff":78,"menu":false,"complexes":0,"dishes":0,"orders":0,"sbs":true,"terminals":1,"skudInst":false,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Правдинск","school":"Средняя Школа Г. Правдинска","pupils":671,"ls":701,"cards":142,"parents":329,"tariffs":23,"tariffsActive":11,"lsTariff":493,"menu":true,"complexes":5,"dishes":10,"orders":1,"sbs":false,"terminals":0,"skudInst":false,"skudConn":false,"kshpShort":"Индивидуальный предприниматель Дараган Л"},{"city":"Правдинск","school":"Средняя Школа П. Домново","pupils":252,"ls":285,"cards":2,"parents":0,"tariffs":16,"tariffsActive":9,"lsTariff":200,"menu":true,"complexes":5,"dishes":10,"orders":0,"sbs":false,"terminals":0,"skudInst":false,"skudConn":false,"kshpShort":"Индивидуальный предприниматель Дараган Л"},{"city":"Правдинск","school":"Средняя Школа П. Дружба","pupils":143,"ls":146,"cards":2,"parents":105,"tariffs":16,"tariffsActive":16,"lsTariff":99,"menu":true,"complexes":5,"dishes":10,"orders":0,"sbs":false,"terminals":0,"skudInst":false,"skudConn":false,"kshpShort":"Индивидуальный предприниматель Дараган Л"},{"city":"Правдинск","school":"Средняя Школа П. Железнодорожный","pupils":369,"ls":369,"cards":5,"parents":61,"tariffs":25,"tariffsActive":13,"lsTariff":249,"menu":true,"complexes":5,"dishes":10,"orders":1,"sbs":false,"terminals":0,"skudInst":false,"skudConn":false,"kshpShort":"Индивидуальный предприниматель Дараган Л"},{"city":"Правдинск","school":"Средняя Школа П. Крылово","pupils":187,"ls":170,"cards":1,"parents":0,"tariffs":0,"tariffsActive":0,"lsTariff":0,"menu":true,"complexes":5,"dishes":10,"orders":0,"sbs":false,"terminals":0,"skudInst":false,"skudConn":false,"kshpShort":"Индивидуальный предприниматель Дараган Л"},{"city":"Балтийск","school":"МБОУ СОШ № 8","pupils":165,"ls":141,"cards":3,"parents":18,"tariffs":15,"tariffsActive":7,"lsTariff":86,"menu":true,"complexes":7,"dishes":127,"orders":0,"sbs":false,"terminals":1,"skudInst":false,"skudConn":false,"kshpShort":"МИТПРОДТОРГ"},{"city":"Светлогорск","school":"МАОУ СОШ №1 Светлогорск","pupils":1348,"ls":1520,"cards":70,"parents":270,"tariffs":31,"tariffsActive":26,"lsTariff":1816,"menu":true,"complexes":10,"dishes":402,"orders":0,"sbs":true,"terminals":2,"skudInst":false,"skudConn":false,"kshpShort":"МИТПРОДТОРГ"},{"city":"Светлогорск","school":"МАОУ СОШ П. Донское","pupils":234,"ls":220,"cards":103,"parents":0,"tariffs":8,"tariffsActive":8,"lsTariff":50,"menu":true,"complexes":10,"dishes":402,"orders":0,"sbs":true,"terminals":1,"skudInst":false,"skudConn":false,"kshpShort":"МИТПРОДТОРГ"},{"city":"Светлогорск","school":"МБОУ \"ООШ п. Приморье\"","pupils":113,"ls":137,"cards":11,"parents":0,"tariffs":8,"tariffsActive":8,"lsTariff":69,"menu":true,"complexes":10,"dishes":402,"orders":0,"sbs":true,"terminals":1,"skudInst":false,"skudConn":false,"kshpShort":"МИТПРОДТОРГ"},{"city":"Светлый","school":"МБОУ СОШ № 1","pupils":1198,"ls":0,"cards":0,"parents":0,"tariffs":0,"tariffsActive":0,"lsTariff":0,"menu":true,"complexes":6,"dishes":256,"orders":0,"sbs":true,"terminals":2,"skudInst":false,"skudConn":false,"kshpShort":"МИТПРОДТОРГ"},{"city":"Светлый","school":"МБОУ СОШ № 2","pupils":579,"ls":0,"cards":0,"parents":0,"tariffs":0,"tariffsActive":0,"lsTariff":0,"menu":true,"complexes":6,"dishes":256,"orders":0,"sbs":true,"terminals":1,"skudInst":false,"skudConn":false,"kshpShort":"МИТПРОДТОРГ"},{"city":"Светлый","school":"МБОУ СОШ № 5","pupils":694,"ls":696,"cards":31,"parents":20,"tariffs":4,"tariffsActive":4,"lsTariff":500,"menu":true,"complexes":7,"dishes":127,"orders":0,"sbs":true,"terminals":2,"skudInst":false,"skudConn":false,"kshpShort":"МИТПРОДТОРГ"},{"city":"Славск","school":"МАОУ \"Ясновская СОШ\" имени Адмирала В.Г. Егорова","pupils":165,"ls":170,"cards":98,"parents":30,"tariffs":22,"tariffsActive":11,"lsTariff":153,"menu":true,"complexes":11,"dishes":250,"orders":0,"sbs":false,"terminals":0,"skudInst":false,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Славск","school":"МБОУ \"Большаковская СОШ\"","pupils":393,"ls":416,"cards":4,"parents":56,"tariffs":25,"tariffsActive":13,"lsTariff":289,"menu":true,"complexes":11,"dishes":250,"orders":0,"sbs":false,"terminals":0,"skudInst":false,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Славск","school":"МБОУ \"Прохладненская ООШ\"","pupils":88,"ls":88,"cards":3,"parents":18,"tariffs":17,"tariffsActive":7,"lsTariff":79,"menu":true,"complexes":11,"dishes":250,"orders":2,"sbs":false,"terminals":0,"skudInst":false,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Славск","school":"МБОУ \"Славская СОШ\"","pupils":619,"ls":619,"cards":0,"parents":1,"tariffs":15,"tariffsActive":9,"lsTariff":285,"menu":true,"complexes":11,"dishes":250,"orders":0,"sbs":true,"terminals":2,"skudInst":false,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Славск","school":"МБОУ \"Тимирязевская СОШ\"","pupils":137,"ls":137,"cards":0,"parents":27,"tariffs":14,"tariffsActive":8,"lsTariff":39,"menu":true,"complexes":11,"dishes":250,"orders":1,"sbs":false,"terminals":0,"skudInst":false,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Советск","school":"МАОУ Гимназия №1 г. Советска (младший корпус)","pupils":759,"ls":306,"cards":0,"parents":11,"tariffs":13,"tariffsActive":11,"lsTariff":643,"menu":true,"complexes":11,"dishes":250,"orders":9,"sbs":true,"terminals":1,"skudInst":false,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Советск","school":"МАОУ Гимназия №1 г. Советска (старший корпус)","pupils":0,"ls":456,"cards":5,"parents":125,"tariffs":10,"tariffsActive":10,"lsTariff":253,"menu":true,"complexes":11,"dishes":250,"orders":46,"sbs":true,"terminals":1,"skudInst":false,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Советск","school":"МАОУ Лицей № 10 г. Советск (младший корпус)","pupils":801,"ls":330,"cards":0,"parents":124,"tariffs":10,"tariffsActive":6,"lsTariff":1114,"menu":true,"complexes":11,"dishes":250,"orders":25,"sbs":true,"terminals":1,"skudInst":false,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Советск","school":"МАОУ Лицей № 10 г. Советск (старший корпус)","pupils":0,"ls":1300,"cards":1,"parents":334,"tariffs":14,"tariffsActive":12,"lsTariff":346,"menu":true,"complexes":11,"dishes":250,"orders":49,"sbs":true,"terminals":2,"skudInst":false,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Советск","school":"МАОУ Лицей №5","pupils":789,"ls":240,"cards":1,"parents":48,"tariffs":11,"tariffsActive":11,"lsTariff":354,"menu":true,"complexes":3,"dishes":0,"orders":0,"sbs":false,"terminals":0,"skudInst":false,"skudConn":false,"kshpShort":"Лицей №5"},{"city":"Советск","school":"МАОУ Лицей №5 (ст. корпус)","pupils":0,"ls":675,"cards":11,"parents":144,"tariffs":16,"tariffsActive":16,"lsTariff":527,"menu":true,"complexes":15,"dishes":95,"orders":21,"sbs":false,"terminals":0,"skudInst":false,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Советск","school":"МАОУ СОШ им. Героя Советского Союза К.Я. Талаха к2","pupils":874,"ls":374,"cards":1,"parents":0,"tariffs":16,"tariffsActive":16,"lsTariff":357,"menu":true,"complexes":11,"dishes":250,"orders":0,"sbs":false,"terminals":0,"skudInst":false,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Советск","school":"МАОУ СОШ им. Героя Советского Союза К.Я. Талаха к3","pupils":0,"ls":195,"cards":0,"parents":0,"tariffs":16,"tariffsActive":16,"lsTariff":168,"menu":true,"complexes":11,"dishes":250,"orders":0,"sbs":false,"terminals":0,"skudInst":false,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Советск","school":"МАОУ СОШ имени Героя Советского Союза К.Я. Талаха","pupils":0,"ls":395,"cards":0,"parents":8,"tariffs":16,"tariffsActive":16,"lsTariff":743,"menu":true,"complexes":11,"dishes":250,"orders":0,"sbs":false,"terminals":0,"skudInst":false,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Черняховск","school":"МАОУ \"Гимназия № 2 Г. Черняховска\" (корпус 1)","pupils":0,"ls":684,"cards":77,"parents":149,"tariffs":10,"tariffsActive":0,"lsTariff":0,"menu":true,"complexes":8,"dishes":216,"orders":0,"sbs":false,"terminals":0,"skudInst":false,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Черняховск","school":"МАОУ \"Гимназия № 2 Г. Черняховска\" (корпус 2)","pupils":983,"ls":520,"cards":150,"parents":116,"tariffs":23,"tariffsActive":13,"lsTariff":13,"menu":true,"complexes":8,"dishes":216,"orders":0,"sbs":false,"terminals":0,"skudInst":false,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Черняховск","school":"МАОУ \"Доваторовская СОШ\"","pupils":113,"ls":44,"cards":0,"parents":0,"tariffs":3,"tariffsActive":3,"lsTariff":44,"menu":true,"complexes":8,"dishes":216,"orders":0,"sbs":false,"terminals":0,"skudInst":false,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Черняховск","school":"МАОУ \"Калиновская СОШ\"","pupils":59,"ls":81,"cards":14,"parents":15,"tariffs":0,"tariffsActive":0,"lsTariff":0,"menu":true,"complexes":8,"dishes":216,"orders":0,"sbs":false,"terminals":0,"skudInst":false,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Черняховск","school":"МАОУ \"Лицей № 7 Г. Черняховска\"","pupils":1149,"ls":1149,"cards":3,"parents":0,"tariffs":9,"tariffsActive":0,"lsTariff":0,"menu":true,"complexes":8,"dishes":216,"orders":0,"sbs":true,"terminals":2,"skudInst":false,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Черняховск","school":"МАОУ Междуреченская СОШ","pupils":188,"ls":184,"cards":1,"parents":0,"tariffs":6,"tariffsActive":6,"lsTariff":102,"menu":true,"complexes":8,"dishes":216,"orders":0,"sbs":false,"terminals":0,"skudInst":false,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Черняховск","school":"МАОУ \"Привольненская СОШ\"","pupils":167,"ls":347,"cards":13,"parents":0,"tariffs":0,"tariffsActive":0,"lsTariff":0,"menu":true,"complexes":8,"dishes":216,"orders":0,"sbs":false,"terminals":0,"skudInst":false,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Черняховск","school":"МАОУ  \"Свободненская общеобразовательная средняя ш","pupils":131,"ls":153,"cards":26,"parents":1,"tariffs":0,"tariffsActive":0,"lsTariff":0,"menu":true,"complexes":8,"dishes":216,"orders":0,"sbs":false,"terminals":0,"skudInst":false,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Черняховск","school":"МАОУ СОШ № 4 Г.Черняховска (корпус 1)","pupils":776,"ls":542,"cards":5,"parents":0,"tariffs":1,"tariffsActive":0,"lsTariff":0,"menu":true,"complexes":8,"dishes":216,"orders":0,"sbs":false,"terminals":0,"skudInst":false,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Черняховск","school":"МАОУ СОШ № 4 Г.Черняховска (корпус 2)","pupils":0,"ls":242,"cards":4,"parents":1,"tariffs":8,"tariffsActive":0,"lsTariff":159,"menu":true,"complexes":8,"dishes":216,"orders":0,"sbs":false,"terminals":0,"skudInst":false,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Черняховск","school":"МАОУ СОШ №5 им. И.Д. Черняховского( 1 корпус)","pupils":648,"ls":555,"cards":303,"parents":52,"tariffs":19,"tariffsActive":9,"lsTariff":1031,"menu":false,"complexes":0,"dishes":0,"orders":0,"sbs":true,"terminals":1,"skudInst":false,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Черняховск","school":"МАОУ СОШ №5 им. И.Д. Черняховского (2 корпус)","pupils":0,"ls":111,"cards":64,"parents":7,"tariffs":31,"tariffsActive":22,"lsTariff":241,"menu":false,"complexes":0,"dishes":0,"orders":0,"sbs":false,"terminals":0,"skudInst":false,"skudConn":false,"kshpShort":"Новый уровень"},{"city":"Янтарный (пгт)","school":"МБОУ СОШ им. М.С.Любушкина МО Янтарный ГО","pupils":344,"ls":346,"cards":3,"parents":167,"tariffs":9,"tariffsActive":5,"lsTariff":443,"menu":true,"complexes":9,"dishes":257,"orders":29,"sbs":true,"terminals":1,"skudInst":false,"skudConn":false,"kshpShort":"МИТПРОДТОРГ"}]}};
+const CITY = DATA.city, OBL = DATA.oblast;
+const D = CITY.dates, OPS = CITY.operators;
 
-const fmt = n => n.toLocaleString('ru-RU');
-const fmtK = n => n>=1e6 ? (n/1e6).toFixed(2).replace('.',',')+' млн' : n>=1e3 ? Math.round(n/1e3)+' тыс' : String(n);
-const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
-
-let filterOp = null;
-
-/* ---------- theme ---------- */
-document.getElementById('theme').onclick = () => {
-  const cur = document.documentElement.getAttribute('data-theme');
-  const dark = cur ? cur === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
-  document.documentElement.setAttribute('data-theme', dark ? 'light' : 'dark');
-  drawLine();
-  renderTable();
+const fmt = n => Math.round(n).toLocaleString('ru-RU');
+const pct = (a,b) => b ? (100*a/b).toFixed(1).replace('.',',')+'%' : '—';
+const plural = (n, one, few, many) => {
+  const a = Math.abs(n) % 100, b = a % 10;
+  if(a > 10 && a < 20) return many;
+  if(b > 1 && b < 5) return few;
+  if(b === 1) return one;
+  return many;
 };
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const li = a => '<ul>'+a.map(x=>'<li>'+x+'</li>').join('')+'</ul>';
 
-/* ---------- KPI ---------- */
-function daily(list){ return D.map((_,i)=> list.reduce((a,s)=>a+s.sales[i],0)); }
+/* ===================== ГОРОД: подготовка ===================== */
+const SCHOOLS = [];
+OPS.forEach(o => o.schools.forEach(s => SCHOOLS.push(Object.assign({op:o.name}, s))));
+SCHOOLS.forEach(s => {
+  s.total = s.sales.reduce((a,b)=>a+b,0);
+  s.last = s.sales[s.sales.length-1];
+  s.zeros = s.sales.filter(v=>v===0).length;
+  s.gaps = [s.hot1,s.hot2,s.buf1,s.buf2,s.sets,s.started].filter(v=>v===false).length;
+});
+const daily = list => D.map((_,i)=> list.reduce((a,s)=>a+s.sales[i],0));
 const ALLD = daily(SCHOOLS);
-const TOTAL = ALLD.reduce((a,b)=>a+b,0);
+const CITY_TOTAL = ALLD.reduce((a,b)=>a+b,0);
 const activeSchools = SCHOOLS.filter(s=>s.total>0).length;
 const gapSchools = SCHOOLS.filter(s=>s.gaps>0).length;
 
-document.getElementById('kpis').innerHTML = [
-  ['Транзакций за 8 дней', fmt(TOTAL), 'все операторы, 43 школы', ''],
-  ['Последний день 11.09', fmt(ALLD[7])+' тр.', '×'+(ALLD[7]/ALLD[0]).toFixed(1).replace('.',',')+' к 2 сентября', 'up'],
+/* ===================== ОБЛАСТЬ: подготовка ===================== */
+const OS = OBL.schools;
+OS.forEach(r => r.pct = r.pupils ? r.cards/r.pupils*100 : 0);
+const sum = (arr,f) => arr.reduce((a,x)=>a+f(x),0);
+const O = {
+  n: OS.length,
+  cities: [...new Set(OS.map(r=>r.city))],
+  pupils: sum(OS,r=>r.pupils), ls: sum(OS,r=>r.ls),
+  cards: sum(OS,r=>r.cards), parents: sum(OS,r=>r.parents),
+  menu: OS.filter(r=>r.menu).length,
+  sbs: OS.filter(r=>r.sbs).length,
+  skudInst: OS.filter(r=>r.skudInst).length,
+  skudConn: OS.filter(r=>r.skudConn).length,
+  terminals: sum(OS,r=>r.terminals),
+  orders: sum(OS,r=>r.orders),
+  noCards: OS.filter(r=>r.cards===0).length,
+  withOrders: OS.filter(r=>r.orders>0).length,
+};
+const byCity = {};
+OS.forEach(r => {
+  const a = byCity[r.city] || (byCity[r.city] = {city:r.city,n:0,pupils:0,cards:0,parents:0,menu:0,sbs:0,skud:0,term:0});
+  a.n++; a.pupils+=r.pupils; a.cards+=r.cards; a.parents+=r.parents;
+  a.menu += r.menu?1:0; a.sbs += r.sbs?1:0; a.skud += r.skudInst?1:0; a.term += r.terminals;
+});
+const CITIES = Object.values(byCity).sort((a,b)=>b.cards-a.cards);
+const byKshp = {};
+OS.forEach(r => {
+  const a = byKshp[r.kshpShort] || (byKshp[r.kshpShort] = {name:r.kshpShort,n:0,pupils:0,cards:0,menu:0,sbs:0,skud:0,orders:0});
+  a.n++; a.pupils+=r.pupils; a.cards+=r.cards;
+  a.menu += r.menu?1:0; a.sbs += r.sbs?1:0; a.skud += r.skudInst?1:0; a.orders += r.orders;
+});
+const KSHP = Object.values(byKshp).sort((a,b)=>b.n-a.n);
+
+/* ===================== роутер ===================== */
+const screens = {start:'screen-start', city:'screen-city', oblast:'screen-oblast'};
+function show(name){
+  Object.entries(screens).forEach(([k,id]) => document.getElementById(id).hidden = (k!==name));
+  document.getElementById('foot').hidden = (name==='start');
+  if(name==='city') drawLine();
+  window.scrollTo(0,0);
+  try{ location.hash = name==='start' ? '' : name; }catch(e){}
+}
+document.querySelectorAll('[data-back]').forEach(b=> b.onclick = ()=>show('start'));
+document.querySelectorAll('[data-goto]').forEach(b=> b.onclick = ()=>show(b.dataset.goto));
+
+function toggleTheme(){
+  const cur = document.documentElement.getAttribute('data-theme');
+  const dark = cur ? cur === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.setAttribute('data-theme', dark ? 'light' : 'dark');
+  drawLine(); renderCityTable();
+}
+document.getElementById('theme0').onclick = toggleTheme;
+document.querySelectorAll('[data-theme-toggle]').forEach(b=> b.onclick = toggleTheme);
+
+/* ===================== стартовый экран ===================== */
+document.getElementById('choices').innerHTML = `
+  <button class="choice" type="button" data-screen="city">
+    <span class="ttl">Город Калининград <span class="arrow">→</span></span>
+    <span class="big">${fmt(CITY_TOTAL)}</span>
+    <span class="bigsub">транзакций за ${D.length} учебных дней (${D[0]}–${D[D.length-1]})</span>
+    <ul>
+      <li><span>Школ</span><b>43</b></li>
+      <li><span>Операторов питания</span><b>${OPS.length}</b></li>
+      <li><span>Школ с продажами</span><b>${activeSchools} из 43</b></li>
+      <li><span>Транзакций в последний день</span><b>${fmt(ALLD[ALLD.length-1])}</b></li>
+    </ul>
+  </button>
+  <button class="choice" type="button" data-screen="oblast">
+    <span class="ttl">Калининградская область <span class="arrow">→</span></span>
+    <span class="big">${fmt(O.cards)}</span>
+    <span class="bigsub">привязанных карт из ${fmt(O.pupils)} учащихся · срез на ${OBL.date}</span>
+    <ul>
+      <li><span>Школ</span><b>${O.n}</b></li>
+      <li><span>Муниципалитетов</span><b>${O.cities.length}</b></li>
+      <li><span>Операторов питания</span><b>${KSHP.length}</b></li>
+      <li><span>Школ с активным меню</span><b>${O.menu} из ${O.n}</b></li>
+    </ul>
+  </button>`;
+document.querySelectorAll('.choice').forEach(c=> c.onclick = ()=>show(c.dataset.screen));
+document.getElementById('startfoot').textContent =
+  `Город — выгрузка «Операторы питания» за ${D[0]}–${D[D.length-1]}, обороты пересчитаны в транзакции по 150 ₽. Область — отчёт на ${OBL.date}.`;
+document.getElementById('foot').textContent =
+  `Источники: «Операторы питания» (город, ${D[0]}–${D[D.length-1]}) и «Отчет Калининград ${OBL.date}» (область). Обновлено 15.09.2026.`;
+
+/* ===================== ГОРОД: KPI ===================== */
+document.getElementById('citySub').textContent =
+  `${OPS.length} операторов · 43 школы · учебные дни ${D[0]}–${D[D.length-1]} · 1 транзакция = 150 ₽`;
+document.getElementById('cityKpis').innerHTML = [
+  ['Транзакций за период', fmt(CITY_TOTAL), `${D.length} учебных дней, 43 школы`, ''],
+  [`Последний день ${D[D.length-1]}`, fmt(ALLD[ALLD.length-1]), '×'+(ALLD[ALLD.length-1]/ALLD[0]).toFixed(1).replace('.',',')+' к первому дню', 'up'],
   ['Школы с продажами', activeSchools+' из 43', activeSchools<43 ? (43-activeSchools)+' школа без транзакций' : 'все школы работают', activeSchools<43?'bad':''],
   ['Школы с пробелами', gapSchools+' из 43', 'нет меню, комплексов или продаж', gapSchools?'bad':'']
 ].map(([l,v,n,c])=>`<div class="kpi"><div class="lab">${l}</div><div class="val">${v}</div><div class="note ${c}">${n}</div></div>`).join('');
 
-/* ---------- line chart ---------- */
+/* ===================== ГОРОД: график ===================== */
+let filterOp = null;
 function drawLine(){
+  const box = document.getElementById('lineBox');
+  if(!box || document.getElementById('screen-city').hidden) return;
   const list = filterOp ? SCHOOLS.filter(s=>s.op===filterOp) : SCHOOLS;
   const vals = daily(list);
-  const cw = document.getElementById('lineBox').clientWidth || 760;
+  const cw = box.clientWidth || 760;
   const W = Math.max(320, Math.min(760, Math.round(cw)));
   const narrow = W < 520;
   const H = narrow ? 210 : 240, ML = narrow ? 40 : 54, MR = narrow ? 16 : 30, MT = 22, MB = 28;
@@ -301,14 +488,13 @@ function drawLine(){
   let xs='', dots='', hits='';
   D.forEach((d,i)=>{
     const anchor = i===0 ? 'start' : i===D.length-1 ? 'end' : 'middle';
-    if(!narrow || (i%2===0 && i < D.length-2) || i===D.length-1)
+    if(!narrow || i%2===0 || i===D.length-1)
       xs += `<text x="${x(i).toFixed(1)}" y="${H-9}" text-anchor="${anchor}" font-size="11" fill="${MU}">${d}</text>`;
     dots += `<circle cx="${x(i).toFixed(1)}" cy="${y(vals[i]).toFixed(1)}" r="4" fill="${AC}" stroke="${SUR}" stroke-width="2"/>`;
-    hits += `<rect class="hit" data-i="${i}" x="${(x(i)-22).toFixed(1)}" y="${MT}" width="44" height="${H-MT-MB}" fill="transparent"/>`;
+    hits += `<rect class="hit" data-i="${i}" x="${(x(i)-20).toFixed(1)}" y="${MT}" width="40" height="${H-MT-MB}" fill="transparent"/>`;
   });
-  const lastLabel = `<text x="${(x(D.length-1)).toFixed(1)}" y="${Math.max(MT-6, y(vals[D.length-1])-12).toFixed(1)}" text-anchor="end" font-size="12" font-weight="600" fill="${css('--ink')}">${fmt(vals[D.length-1])} тр.</text>`;
-  document.getElementById('lineBox').innerHTML =
-   `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Транзакции по дням"><defs>
+  const lastLabel = `<text x="${x(D.length-1).toFixed(1)}" y="${Math.max(MT-6, y(vals[D.length-1])-12).toFixed(1)}" text-anchor="end" font-size="12" font-weight="600" fill="${css('--ink')}">${fmt(vals[D.length-1])} тр.</text>`;
+  box.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Транзакции по дням"><defs>
       <linearGradient id="ag" x1="0" y1="0" x2="0" y2="1">
         <stop offset="0%" stop-color="${AC}" stop-opacity="0.20"/><stop offset="100%" stop-color="${AC}" stop-opacity="0.02"/>
       </linearGradient></defs>
@@ -317,11 +503,11 @@ function drawLine(){
       ${dots}${lastLabel}${xs}
       <line id="cross" x1="0" y1="${MT}" x2="0" y2="${H-MB}" stroke="${MU}" stroke-width="1" stroke-dasharray="3 3" opacity="0"/>
       ${hits}</svg><div class="tt" id="tt"></div>`;
-  document.getElementById('dynNote').textContent = (filterOp || 'Все операторы') + ' · итого ' + fmt(vals.reduce((a,b)=>a+b,0)) + ' транзакций';
-
-  const box = document.getElementById('lineBox'), tt = document.getElementById('tt'), cross = document.getElementById('cross');
+  document.getElementById('dynNote').textContent =
+    (filterOp || 'Все операторы') + ' · итого ' + fmt(vals.reduce((a,b)=>a+b,0)) + ' транзакций';
+  const tt = document.getElementById('tt'), cross = document.getElementById('cross');
   box.querySelectorAll('.hit').forEach(r=>{
-    const show = e => {
+    const showTip = e => {
       const i = +r.dataset.i, rect = box.getBoundingClientRect();
       const px = rect.width * x(i)/W, py = rect.height * y(vals[i])/H;
       cross.setAttribute('x1', x(i)); cross.setAttribute('x2', x(i)); cross.setAttribute('opacity','.7');
@@ -331,13 +517,13 @@ function drawLine(){
       tt.style.top = Math.max(py - tt.offsetHeight - 12, 0) + 'px';
       e.preventDefault();
     };
-    r.addEventListener('mouseenter', show); r.addEventListener('touchstart', show, {passive:false});
+    r.addEventListener('mouseenter', showTip); r.addEventListener('touchstart', showTip, {passive:false});
   });
   box.addEventListener('mouseleave', ()=>{ tt.style.opacity=0; cross.setAttribute('opacity','0'); });
 }
 
-/* ---------- operator bars ---------- */
-function renderBars(){
+/* ===================== ГОРОД: операторы ===================== */
+function renderOpBars(){
   const rows = OPS.map(o=>({name:o.name, n:o.schools.length, total:o.schools.reduce((a,s)=>a+s.sales.reduce((x,y)=>x+y,0),0)}))
                   .sort((a,b)=>b.total-a.total);
   const max = rows[0].total;
@@ -347,24 +533,22 @@ function renderBars(){
       <span class="track"><span class="fill" style="width:${(r.total/max*100).toFixed(1)}%"></span></span>
       <span class="v">${fmt(r.total)}</span>
     </button>`).join('');
-  document.querySelectorAll('.bar').forEach(b=> b.onclick = () => {
+  document.querySelectorAll('#opBars .bar').forEach(b=> b.onclick = () => {
     filterOp = filterOp === b.dataset.op ? null : b.dataset.op;
-    renderBars(); drawLine(); renderTable();
+    renderOpBars(); drawLine(); renderCityTable();
     document.getElementById('schTable').scrollIntoView({behavior:'smooth', block:'start'});
   });
 }
 
-/* ---------- sparkline ---------- */
 function spark(sales){
-  const w=76,h=20,max=Math.max(...sales,1);
+  const w=82,h=20,max=Math.max(...sales,1);
   const pts = sales.map((v,i)=>`${(i*(w-4)/(sales.length-1)+2).toFixed(1)},${(h-2-(v/max)*(h-5)).toFixed(1)}`).join(' ');
-  const lx = w-2, ly = h-2-(sales[sales.length-1]/max)*(h-5);
-  return `<svg class="spark" viewBox="0 0 ${w} ${h}" aria-hidden="true"><polyline points="${pts}" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-linejoin="round"/><circle cx="${lx-0}" cy="${ly.toFixed(1)}" r="2" fill="var(--accent)"/></svg>`;
+  const ly = h-2-(sales[sales.length-1]/max)*(h-5);
+  return `<svg class="spark" viewBox="0 0 ${w} ${h}" aria-hidden="true"><polyline points="${pts}" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-linejoin="round"/><circle cx="${w-2}" cy="${ly.toFixed(1)}" r="2" fill="var(--accent)"/></svg>`;
 }
 
-/* ---------- table ---------- */
 let sortK='total', sortDir=-1;
-function renderTable(){
+function renderCityTable(){
   const q = document.getElementById('q').value.trim().toLowerCase();
   const only = document.getElementById('onlyf').value;
   let rows = SCHOOLS.slice();
@@ -373,10 +557,9 @@ function renderTable(){
   if(only==='zero') rows = rows.filter(s=>s.zeros>=3);
   if(only==='gaps') rows = rows.filter(s=>s.gaps>0);
   rows.sort((a,b)=> (typeof a[sortK]==='string' ? a[sortK].localeCompare(b[sortK],'ru') : a[sortK]-b[sortK]) * sortDir);
-  const tb = document.querySelector('#schTable tbody');
-  tb.innerHTML = rows.length ? rows.map(s=>{
+  document.querySelector('#schTable tbody').innerHTML = rows.length ? rows.map(s=>{
     let st;
-    if(s.total===0) st = '<span class="chip no">нет продаж</span>';
+    if(s.total===0) st = '<span class="chip no">нет транзакций</span>';
     else if(s.gaps>0) st = '<span class="chip wn">пробелы: '+s.gaps+'</span>';
     else if(s.zeros>=3) st = '<span class="chip wn">'+s.zeros+' дня без продаж</span>';
     else st = '<span class="chip ok">в работе</span>';
@@ -388,35 +571,34 @@ function renderTable(){
 document.querySelectorAll('#schTable th[data-k]').forEach(th=> th.onclick = () => {
   const k = th.dataset.k;
   if(sortK===k) sortDir*=-1; else { sortK=k; sortDir = (k==='name'||k==='op') ? 1 : -1; }
-  renderTable();
+  renderCityTable();
 });
-document.getElementById('q').addEventListener('input', renderTable);
-document.getElementById('onlyf').addEventListener('change', renderTable);
+document.getElementById('q').addEventListener('input', renderCityTable);
+document.getElementById('onlyf').addEventListener('change', renderCityTable);
 
-/* ---------- readiness ---------- */
-function dot(v){ return v===true ? '<span class="dot ok">✓</span>' : v===false ? '<span class="dot no">✕</span>' : '<span class="dot na">—</span>'; }
+/* ===================== ГОРОД: готовность ===================== */
+const dot = v => v===true ? '<span class="dot ok">✓</span>' : v===false ? '<span class="dot no">✕</span>' : '<span class="dot na">—</span>';
 document.getElementById('ready').innerHTML = OPS.map(o=>{
   const bad = o.schools.reduce((a,s)=>a+[s.hot1,s.hot2,s.buf1,s.buf2,s.sets,s.started].filter(v=>v===false).length,0);
   const meta = [
-    `<span class="chip ok">доступы</span>`,
-    `<span class="chip ok">обучение</span>`,
+    '<span class="chip ok">доступы</span>',
+    '<span class="chip ok">обучение</span>',
     `<span class="chip ${o.cashier_flag?'wn':'ok'}">кассиры: ${o.cashiers.replace(/^да\s*/i,'')}</span>`,
     `<span class="chip ok">${o.assortment.replace(/^да\s*/i,'')}</span>`,
-    bad ? `<span class="chip no">пробелов: ${bad}</span>` : `<span class="chip ok">всё заведено</span>`
+    bad ? `<span class="chip no">пробелов: ${bad}</span>` : '<span class="chip ok">всё заведено</span>'
   ].join('');
   const rows = o.schools.map(s=>`<tr><td>${s.name}</td>
     <td class="c">${dot(s.hot1)}</td><td class="c">${dot(s.hot2)}</td>
     <td class="c">${dot(s.buf1)}</td><td class="c">${dot(s.buf2)}</td>
     <td class="c">${dot(s.sets)}</td><td class="c">${dot(s.started)}</td></tr>`).join('');
   return `<div class="opcard">
-    <div class="ophead"><span class="nm">${o.num}. ${o.name}</span><span class="mt">${o.schools.length} школ${o.schools.length===1?'а':''}</span></div>
+    <div class="ophead"><span class="nm">${o.num}. ${o.name}</span><span class="mt">${o.schools.length} ${plural(o.schools.length,'школа','школы','школ')}</span></div>
     <div class="opmeta">${meta}</div>
     <div class="rgrid"><table><thead><tr><th>Школа</th><th>ГП К1</th><th>ГП К2</th><th>БУФ К1</th><th>БУФ К2</th><th>Компл.</th><th>Прод.</th></tr></thead><tbody>${rows}</tbody></table></div>
   </div>`;
 }).join('');
 
-/* ---------- issues ---------- */
-const li = a => '<ul>'+a.map(x=>'<li>'+x+'</li>').join('')+'</ul>';
+/* ===================== ГОРОД: проблемы ===================== */
 const noSales = SCHOOLS.filter(s=>s.total===0);
 const bufGaps = SCHOOLS.filter(s=>s.buf1===false||s.buf2===false);
 const hotGaps = SCHOOLS.filter(s=>s.hot1===false||s.hot2===false);
@@ -424,21 +606,144 @@ const setGaps = SCHOOLS.filter(s=>s.sets===false);
 const zeroDays = SCHOOLS.filter(s=>s.zeros>=3 && s.total>0);
 const cashFlag = OPS.filter(o=>o.cashier_flag);
 const notes = OPS.filter(o=>o.issues || o.note);
+const cityItems = [];
+if(noSales.length) cityItems.push(['c','Продажи не начаты', `${noSales.length} ${plural(noSales.length,'школа','школы','школ')}: ${noSales.map(s=>s.name+' ('+s.op+')').join(', ')}. Меню буфета не заведено ни в одном корпусе, за ${D.length} дней — ноль транзакций.`]);
+if(bufGaps.length) cityItems.push(['c','Не заведено меню буфета', `${bufGaps.length} ${plural(bufGaps.length,'школа','школы','школ')}, хотя бы в одном корпусе:` + li(bufGaps.map(s=>s.name+' — '+s.op))]);
+if(hotGaps.length) cityItems.push(['c','Не заведено меню горячего питания', `${hotGaps.length} ${plural(hotGaps.length,'школа','школы','школ')}:` + li(hotGaps.map(s=>s.name+' — '+s.op))]);
+if(setGaps.length) cityItems.push(['w','Не составлены комплексы', setGaps.map(s=>s.name+' — '+s.op).join(', ')]);
+if(zeroDays.length) cityItems.push(['w','Продажи идут с перебоями', `${zeroDays.length} ${plural(zeroDays.length,'школа','школы','школ')} с тремя и более днями без транзакций:` + li(zeroDays.map(s=>s.name+' — '+s.zeros+' дн. из '+D.length+', '+fmt(s.total)+' транзакций за период'))]);
+if(cashFlag.length) cityItems.push(['w','Кассиров меньше, чем терминалов', cashFlag.map(o=>o.name+' ('+o.cashiers+')').join('; ') + '. Состав кассиров заведён не полностью.']);
+cityItems.push(['w','Наименования в комплектах', 'Повторяющееся замечание: не во всех комплектах прописано наименование позиции. Мешает разбору отчётов по комплексам.']);
+cityItems.push(['i','Замечания и примечания из мониторинга', notes.map(o=>`<div style="margin-top:8px"><b>${o.name}</b>${o.note?`<blockquote>${o.note.trim()}</blockquote>`:''}${o.issues?`<blockquote>${o.issues.trim()}</blockquote>`:''}</div>`).join('')]);
+document.getElementById('issues').innerHTML = cityItems.map(([sev,t,d])=>
+  `<div class="issue"><div class="sev ${sev}"></div><div class="body"><div class="t">${t}</div><div class="d">${d}</div></div></div>`).join('');
+document.getElementById('cityIssuesNote').textContent = 'По состоянию на ' + D[D.length-1];
 
-const items = [];
-if(noSales.length) items.push(['c','Продажи не начаты', `${noSales.length} школа: ${noSales.map(s=>s.name+' ('+s.op+')').join(', ')}. Меню буфета не заведено ни в одном корпусе, за 8 дней — ноль транзакций.`]);
-if(bufGaps.length) items.push(['c','Не заведено меню буфета', `${bufGaps.length} школ, хотя бы в одном корпусе:` + li(bufGaps.map(s=>s.name+' — '+s.op))]);
-if(hotGaps.length) items.push(['c','Не заведено меню горячего питания', `${hotGaps.length} школы:` + li(hotGaps.map(s=>s.name+' — '+s.op))]);
-if(setGaps.length) items.push(['w','Не составлены комплексы', setGaps.map(s=>s.name+' — '+s.op).join(', ')]);
-if(zeroDays.length) items.push(['w','Продажи идут с перебоями', `${zeroDays.length} школ с тремя и более днями без транзакций:` + li(zeroDays.map(s=>s.name+' — '+s.zeros+' дн. из 8, '+fmt(s.total)+' транзакций за период'))]);
-if(cashFlag.length) items.push(['w','Кассиров меньше, чем терминалов', cashFlag.map(o=>o.name+' ('+o.cashiers+')').join('; ') + '. Состав кассиров заведён не полностью.']);
-items.push(['w','Наименования в комплектах', 'Повторяющееся замечание у 7 операторов: не во всех комплектах прописано наименование позиции. Мешает разбору отчётов по комплексам.']);
-items.push(['i','Замечания и примечания из мониторинга', notes.map(o=>`<div style="margin-top:8px"><b>${o.name}</b>${o.note?`<blockquote>${o.note.trim()}</blockquote>`:''}${o.issues?`<blockquote>${o.issues.trim()}</blockquote>`:''}</div>`).join('')]);
+/* ===================== ОБЛАСТЬ ===================== */
+document.getElementById('oblSub').textContent =
+  `${O.n} ${plural(O.n,'школа','школы','школ')} · ${O.cities.length} ${plural(O.cities.length,'муниципалитет','муниципалитета','муниципалитетов')} · ${KSHP.length} ${plural(KSHP.length,'оператор','оператора','операторов')} питания · срез на ${OBL.date}`;
 
-document.getElementById('issues').innerHTML = items.map(([sev,t,d])=>
+document.getElementById('oblKpis').innerHTML = [
+  ['Привязано карт', fmt(O.cards), pct(O.cards,O.pupils)+' от '+fmt(O.pupils)+' учащихся', 'bad'],
+  ['ЛК родителей создано', fmt(O.parents), pct(O.parents,O.pupils)+' от числа учащихся', 'wn'],
+  ['Школы с активным меню', O.menu+' из '+O.n, (O.n-O.menu)+' '+plural(O.n-O.menu,'школа','школы','школ')+' без меню', (O.n-O.menu)?'wn':''],
+  ['СКУД подключён', O.skudConn+' из '+O.n, 'установлен в '+O.skudInst+', терминалов '+O.terminals, 'bad']
+].map(([l,v,n,c])=>`<div class="kpi"><div class="lab">${l}</div><div class="val">${v}</div><div class="note ${c}">${n}</div></div>`).join('');
+
+let filterCity = null;
+function renderOblCityBars(){
+  const max = CITIES[0].cards || 1;
+  document.getElementById('oblCityBars').innerHTML = CITIES.map(c=>`
+    <button class="bar" type="button" data-city="${c.city}" aria-pressed="${filterCity===c.city}">
+      <span class="nm">${c.city}<span style="color:var(--muted)"> · ${c.n} шк.</span></span>
+      <span class="track"><span class="fill" style="width:${(c.cards/max*100).toFixed(1)}%"></span></span>
+      <span class="v">${fmt(c.cards)} <small>${pct(c.cards,c.pupils)}</small></span>
+    </button>`).join('');
+  document.querySelectorAll('#oblCityBars .bar').forEach(b=> b.onclick = () => {
+    filterCity = filterCity === b.dataset.city ? null : b.dataset.city;
+    filterKshp = null;
+    renderOblCityBars(); renderKshp(); renderOblTable();
+    document.getElementById('oblTable').scrollIntoView({behavior:'smooth', block:'start'});
+  });
+}
+
+document.getElementById('oblMeters').innerHTML = [
+  ['Активное меню на текущую дату', O.menu, O.n, 'good'],
+  ['Оборудование СБС обновлено', O.sbs, O.n, 'warn'],
+  ['СКУД установлен', O.skudInst, O.n, 'warn'],
+  ['СКУД подключён', O.skudConn, O.n, 'bad'],
+  ['Школы с привязанными картами', O.n-O.noCards, O.n, 'warn'],
+  ['Школы с заявками на питание', O.withOrders, O.n, 'bad']
+].map(([l,v,t,c])=>`<div class="meter ${c}">
+    <div class="mtop"><span>${l}</span><b>${v} / ${t}</b></div>
+    <div class="track"><i style="width:${(100*v/t).toFixed(1)}%"></i></div>
+    <div class="cap">${pct(v,t)} школ области</div>
+  </div>`).join('');
+
+let filterKshp = null;
+function renderKshp(){
+  const src = filterCity ? OS.filter(r=>r.city===filterCity) : OS;
+  const agg = {};
+  src.forEach(r=>{
+    const a = agg[r.kshpShort] || (agg[r.kshpShort]={name:r.kshpShort,n:0,pupils:0,cards:0,menu:0,sbs:0,skud:0,orders:0});
+    a.n++; a.pupils+=r.pupils; a.cards+=r.cards;
+    a.menu += r.menu?1:0; a.sbs += r.sbs?1:0; a.skud += r.skudInst?1:0; a.orders += r.orders;
+  });
+  const rows = Object.values(agg).sort((a,b)=>b.n-a.n);
+  document.querySelector('#kshpTable tbody').innerHTML = rows.map(k=>`
+    <tr style="cursor:pointer" data-kshp="${k.name}">
+      <td class="sch">${k.name}${filterKshp===k.name?' <span class="chip na">фильтр</span>':''}</td>
+      <td class="num">${k.n}</td><td class="num">${fmt(k.pupils)}</td>
+      <td class="num">${fmt(k.cards)}</td><td class="num">${pct(k.cards,k.pupils)}</td>
+      <td><span class="chip ${k.menu===k.n?'ok':k.menu?'wn':'no'}">${k.menu}/${k.n}</span></td>
+      <td class="num">${k.sbs}</td><td class="num">${k.skud}</td><td class="num">${k.orders}</td>
+    </tr>`).join('');
+  document.querySelectorAll('#kshpTable tbody tr').forEach(tr=> tr.onclick = () => {
+    filterKshp = filterKshp === tr.dataset.kshp ? null : tr.dataset.kshp;
+    renderKshp(); renderOblTable();
+    document.getElementById('oblTable').scrollIntoView({behavior:'smooth', block:'start'});
+  });
+}
+
+let oSortK='cards', oSortDir=-1;
+function renderOblTable(){
+  const q = document.getElementById('oq').value.trim().toLowerCase();
+  const only = document.getElementById('oonly').value;
+  let rows = OS.slice();
+  if(filterCity) rows = rows.filter(r=>r.city===filterCity);
+  if(filterKshp) rows = rows.filter(r=>r.kshpShort===filterKshp);
+  if(q) rows = rows.filter(r=>(r.school+' '+r.city+' '+r.kshpShort).toLowerCase().includes(q));
+  if(only==='nocards') rows = rows.filter(r=>r.cards===0);
+  if(only==='nomenu') rows = rows.filter(r=>!r.menu);
+  if(only==='orders') rows = rows.filter(r=>r.orders>0);
+  if(only==='skud') rows = rows.filter(r=>r.skudInst);
+  rows.sort((a,b)=> (typeof a[oSortK]==='string' ? a[oSortK].localeCompare(b[oSortK],'ru') : a[oSortK]-b[oSortK]) * oSortDir);
+  document.querySelector('#oblTable tbody').innerHTML = rows.length ? rows.map(r=>{
+    const eq = [];
+    if(r.terminals) eq.push(`<span class="chip na">терм. ${r.terminals}</span>`);
+    if(r.sbs) eq.push('<span class="chip ok">СБС</span>');
+    if(r.skudConn) eq.push('<span class="chip ok">СКУД вкл.</span>');
+    else if(r.skudInst) eq.push('<span class="chip wn">СКУД уст.</span>');
+    return `<tr><td class="sch">${r.school}</td><td class="op">${r.city}</td><td class="op">${r.kshpShort}</td>
+      <td class="num">${fmt(r.pupils)}</td><td class="num">${fmt(r.cards)}</td>
+      <td class="num">${r.pupils?r.pct.toFixed(1).replace('.',','):'—'}</td>
+      <td class="num">${fmt(r.parents)}</td>
+      <td>${r.menu?'<span class="chip ok">есть</span>':'<span class="chip no">нет</span>'}</td>
+      <td>${eq.join(' ') || '<span class="chip na">—</span>'}</td></tr>`;
+  }).join('') : `<tr><td colspan="9" class="empty">Ничего не найдено</td></tr>`;
+  const f = [filterCity, filterKshp].filter(Boolean).join(' · ');
+  document.getElementById('oblSchNote').textContent = rows.length + ' из ' + O.n + ' школ' + (f ? ' · ' + f : '');
+}
+document.querySelectorAll('#oblTable th[data-k]').forEach(th=> th.onclick = () => {
+  const k = th.dataset.k;
+  if(oSortK===k) oSortDir*=-1; else { oSortK=k; oSortDir = (k==='school'||k==='city'||k==='kshpShort') ? 1 : -1; }
+  renderOblTable();
+});
+document.getElementById('oq').addEventListener('input', renderOblTable);
+document.getElementById('oonly').addEventListener('change', renderOblTable);
+
+/* ОБЛАСТЬ: проблемные зоны */
+const noMenuCities = CITIES.filter(c=>c.menu < c.n);
+const zeroCardSchools = OS.filter(r=>r.cards===0);
+const zeroCardCities = CITIES.filter(c=>c.cards===0);
+const lowCards = CITIES.filter(c=>c.cards>0 && c.cards/c.pupils < 0.03).sort((a,b)=>a.cards/a.pupils - b.cards/b.pupils);
+const oblItems = [
+  ['c','Карты почти не привязаны', `${fmt(O.cards)} карт на ${fmt(O.pupils)} учащихся — ${pct(O.cards,O.pupils)}. В ${O.noCards} школах из ${O.n} нет ни одной привязанной карты.` +
+     (zeroCardCities.length ? ' Полностью без карт: ' + zeroCardCities.map(c=>c.city).join(', ') + '.' : '') +
+     (lowCards.length ? li(lowCards.slice(0,6).map(c=>`${c.city} — ${c.cards} карт на ${fmt(c.pupils)} учащихся (${pct(c.cards,c.pupils)})`)) : '')],
+  ['c','СКУД фактически не работает', `Установлен в ${O.skudInst} школах из ${O.n}, подключён — в ${O.skudConn}. Данные Минобра. Терминалов питания установлено ${O.terminals}.`],
+  ['w','Школы без активного меню', `${O.n-O.menu} ${plural(O.n-O.menu,'школа','школы','школ')}:` + li(noMenuCities.map(c=>`${c.city} — ${c.n-c.menu} из ${c.n}`))],
+  ['w','Заявки на питание почти не подаются', `${fmt(O.orders)} заявок всего, только в ${O.withOrders} школах из ${O.n}. Меню заведено, но родители через систему не заказывают.`],
+  ['i','Что уже сделано', `Лицевые счета привязаны почти везде: ${fmt(O.ls)} ЛС — ${pct(O.ls,O.pupils)} от числа учащихся. Активных тарифов ${fmt(sum(OS,r=>r.tariffsActive))} из ${fmt(sum(OS,r=>r.tariffs))} заведённых, активных блюд в меню ${fmt(sum(OS,r=>r.dishes))}, комплексов ${fmt(sum(OS,r=>r.complexes))}. Узкое место — не настройка системы, а выдача и привязка карт.`]
+];
+document.getElementById('oblIssues').innerHTML = oblItems.map(([sev,t,d])=>
   `<div class="issue"><div class="sev ${sev}"></div><div class="body"><div class="t">${t}</div><div class="d">${d}</div></div></div>`).join('');
 
-renderBars(); drawLine(); renderTable();
+/* ===================== запуск ===================== */
+renderOpBars(); renderCityTable();
+renderOblCityBars(); renderKshp(); renderOblTable();
+const h = (location.hash||'').replace('#','');
+show(h==='city'||h==='oblast' ? h : 'start');
 let rz; addEventListener('resize', ()=>{ clearTimeout(rz); rz = setTimeout(drawLine, 180); });
 </script>
 
