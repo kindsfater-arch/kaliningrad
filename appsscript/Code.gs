@@ -63,12 +63,11 @@ function build() {
 function collect_() {
   var src = findSources_(cfg_('FOLDER_ID'));
 
-  var city = src.city
-    ? parseCity_(src.city.book, src.city.updated)
-    : loadPublished_('data/city.json');
-  var oblast = src.oblast
-    ? parseOblast_(src.oblast.book, src.oblast.updated)
-    : loadPublished_('data/oblast.json');
+  var prevCity = loadPublished_('data/city.json');
+  var prevOblast = loadPublished_('data/oblast.json');
+
+  var city = src.city ? parseCity_(src.city.book, src.city.updated) : prevCity;
+  var oblast = src.oblast ? parseOblast_(src.oblast.book, src.oblast.updated) : prevOblast;
 
   if (!city) {
     throw new Error('В папке нет файла операторов питания (ищу шапку «Получены доступы»), ' +
@@ -79,11 +78,98 @@ function collect_() {
                     'и в репозитории нет ранее опубликованного data/oblast.json. Публикация отменена.');
   }
 
+  if (src.city) sanityCity_(city, prevCity);
+  if (src.oblast) sanityOblast_(oblast, prevOblast);
+
   return {
     city: city,
     oblast: oblast,
     updated: laterDate_(city.updated, oblast.updated)
   };
+}
+
+// ────────────────── Заслон от тихой порчи данных ──────────────────
+//
+// Обязательными сделаны только те колонки, без которых разбор бессмыслен.
+// Остальные необязательны: если такую колонку переименуют, разбор не упадёт,
+// а молча подставит нули — и опубликует. Поэтому результат сверяется с прошлой
+// опубликованной версией: обвал количества строк или обнуление показателя,
+// который раньше был ненулевым, означает, что структура выгрузки изменилась.
+//
+// Порог намеренно щадящий (спад более чем на 30%): задача — поймать развал
+// разбора, а не следить за самими данными.
+
+var DROP_LIMIT = 0.7;
+
+function refuse_(scope, problems) {
+  if (!problems.length) return;
+  throw new Error('Проверка не пройдена (' + scope + '): ' + problems.join('; ') +
+    '. Похоже, изменилась структура выгрузки. Публикация отменена, ' +
+    'на сайте осталась прежняя версия — сверьте заголовки колонок в файле.');
+}
+
+function sanityCity_(fresh, prev) {
+  if (!prev || !prev.operators) return;
+  var problems = [];
+
+  if (prev.operators.length && fresh.operators.length < prev.operators.length * DROP_LIMIT) {
+    problems.push('операторов было ' + prev.operators.length + ', стало ' + fresh.operators.length);
+  }
+  var now = citySchools_(fresh), was = citySchools_(prev);
+  if (was && now < was * DROP_LIMIT) problems.push('школ было ' + was + ', стало ' + now);
+
+  if (citySales_(prev) > 0 && citySales_(fresh) === 0) problems.push('все продажи обнулились');
+
+  refuse_('город', problems);
+}
+
+function citySchools_(d) {
+  var n = 0;
+  for (var i = 0; i < d.operators.length; i++) n += d.operators[i].schools.length;
+  return n;
+}
+
+function citySales_(d) {
+  var sum = 0;
+  for (var i = 0; i < d.operators.length; i++) {
+    var ss = d.operators[i].schools;
+    for (var j = 0; j < ss.length; j++) {
+      for (var k = 0; k < ss[j].sales.length; k++) sum += ss[j].sales[k];
+    }
+  }
+  return sum;
+}
+
+var OBLAST_LABELS = {
+  pupils: 'Кол-во учащихся', ls: 'Кол-во привязанных ЛС',
+  cards: 'Общее кол-во привязанных карт', parents: 'Кол-во созданных ЛК Родителя',
+  terminals: 'Кол-во терминалов', menu: 'Признак наличия активного меню'
+};
+
+function sanityOblast_(fresh, prev) {
+  if (!prev || !prev.schools) return;
+  var problems = [];
+
+  if (prev.schools.length && fresh.schools.length < prev.schools.length * DROP_LIMIT) {
+    problems.push('школ было ' + prev.schools.length + ', стало ' + fresh.schools.length);
+  }
+  for (var key in OBLAST_LABELS) {
+    if (!OBLAST_LABELS.hasOwnProperty(key)) continue;
+    if (oblastSum_(prev.schools, key) > 0 && oblastSum_(fresh.schools, key) === 0) {
+      problems.push('колонка «' + OBLAST_LABELS[key] + '» больше не читается');
+    }
+  }
+
+  refuse_('область', problems);
+}
+
+function oblastSum_(schools, key) {
+  var sum = 0;
+  for (var i = 0; i < schools.length; i++) {
+    var v = schools[i][key];
+    sum += (v === true ? 1 : (typeof v === 'number' ? v : 0));
+  }
+  return sum;
 }
 
 /**
@@ -309,12 +395,23 @@ function num_(v) {
 
 function yes_(v) { return /^да$/i.test(txt_(v)); }
 
-/** Ищет колонку по подстроке заголовка. Заголовки в источнике бывают обрезаны — сверяем по началу. */
+/**
+ * Ищет колонку по заголовку. Сначала точное совпадение, и только потом подстрока:
+ * заголовки в выгрузке приходят обрезанными («Признак наличия активного меню на»),
+ * поэтому без поиска по подстроке не обойтись, но короткие общие слова вроде
+ * «Город» или «Установлено» иначе перехватила бы любая колонка, где это слово внутри.
+ */
 function findCol_(row, needles) {
-  for (var i = 0; i < row.length; i++) {
-    var h = norm_(row[i]);
+  var i, j, h;
+  for (i = 0; i < row.length; i++) {
+    h = norm_(row[i]);
     if (!h) continue;
-    for (var j = 0; j < needles.length; j++) if (h.indexOf(needles[j]) >= 0) return i;
+    for (j = 0; j < needles.length; j++) if (h === needles[j]) return i;
+  }
+  for (i = 0; i < row.length; i++) {
+    h = norm_(row[i]);
+    if (!h) continue;
+    for (j = 0; j < needles.length; j++) if (h.indexOf(needles[j]) >= 0) return i;
   }
   return -1;
 }
@@ -463,6 +560,16 @@ function parseCity_(book, updated) {
     if (/терминал/i.test(ops[o].note) && /кассир/i.test(ops[o].note)) {
       ops[o].cashier_flag = 'кассиров меньше, чем терминалов';
     }
+  }
+
+  // Оператор опознаётся по числу в первой колонке — единственное место, завязанное
+  // на положение. Если структура листа поедет, здесь будет пусто, и молча публиковать
+  // пустой дашборд нельзя.
+  var nSchools = 0;
+  for (var q = 0; q < ops.length; q++) nSchools += ops[q].schools.length;
+  if (!ops.length || !nSchools) {
+    throw new Error('В файле операторов не разобрано ни одного оператора со школами — ' +
+                    'похоже, изменилась структура листа (номер оператора ожидается в первой колонке)');
   }
 
   var dates = [];
