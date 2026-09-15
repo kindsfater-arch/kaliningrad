@@ -150,18 +150,24 @@ function classify_(book) {
 
 /** Читает xlsx из Blob. Возвращает { sheets: [ { name, rows } ] }, rows[i] — строка Excel i+1. */
 function readWorkbook_(blob) {
-  var files = {};
+  // Декодируем в текст только нужные записи: в архиве бывает двоичное
+  // содержимое (например, xl/printerSettings/*.bin), гнать его через UTF-8 незачем.
   var parts = Utilities.unzip(blob.setContentType('application/zip'));
-  for (var i = 0; i < parts.length; i++) {
-    files[parts[i].getName()] = parts[i].getDataAsString('UTF-8');
-  }
-  if (!files['xl/workbook.xml']) throw new Error('нет xl/workbook.xml');
+  var raw = {};
+  for (var i = 0; i < parts.length; i++) raw[parts[i].getName()] = parts[i];
+  var cache = {};
+  var files = function (name) {
+    if (!raw[name]) return null;
+    if (!(name in cache)) cache[name] = raw[name].getDataAsString('UTF-8');
+    return cache[name];
+  };
+  if (!files('xl/workbook.xml')) throw new Error('нет xl/workbook.xml');
 
-  var shared = parseSharedStrings_(files['xl/sharedStrings.xml'] || '');
+  var shared = parseSharedStrings_(files('xl/sharedStrings.xml') || '');
 
   var rels = {};
   var relRe = /<Relationship\b([^>]*?)(?:\/>|>)/g, m;
-  var relXml = files['xl/_rels/workbook.xml.rels'] || '';
+  var relXml = files('xl/_rels/workbook.xml.rels') || '';
   while ((m = relRe.exec(relXml))) {
     var ra = attrs_(m[1]);
     if (ra.Id) rels[ra.Id] = ra.Target;
@@ -169,14 +175,15 @@ function readWorkbook_(blob) {
 
   var sheets = [];
   var shRe = /<(?:\w+:)?sheet\b([^>]*?)(?:\/>|>)/g;
-  while ((m = shRe.exec(files['xl/workbook.xml']))) {
+  while ((m = shRe.exec(files('xl/workbook.xml')))) {
     var sa = attrs_(m[1]);
     var target = sa['r:id'] ? rels[sa['r:id']] : null;
     if (!target) continue;
     var path = target.charAt(0) === '/' ? target.substring(1)
              : (target.indexOf('xl/') === 0 ? target : 'xl/' + target);
-    if (!files[path]) continue;
-    sheets.push({ name: sa.name || '', rows: parseSheet_(files[path], shared) });
+    var xml = files(path);
+    if (!xml) continue;
+    sheets.push({ name: sa.name || '', rows: parseSheet_(xml, shared) });
   }
   if (!sheets.length) throw new Error('в книге нет читаемых листов');
   return { sheets: sheets };
