@@ -86,37 +86,47 @@ function collect_() {
   };
 }
 
-/** Перебирает файлы папки и выбирает самый свежий файл каждого типа. */
+/**
+ * Находит в папке самый свежий файл каждого типа.
+ *
+ * Сначала собираем только метаданные и сортируем по дате изменения от новых к старым,
+ * потом разбираем по очереди и останавливаемся, как только нашлись оба типа. Иначе при
+ * накоплении ежедневных выгрузок скрипт разбирал бы всю папку и упёрся бы в лимит времени.
+ */
 function findSources_(folderId) {
-  var folder = DriveApp.getFolderById(folderId);
-  var it = folder.getFiles();
-  var best = { city: null, oblast: null };
-  var seen = 0;
-
+  var it = DriveApp.getFolderById(folderId).getFiles();
+  var candidates = [];
   while (it.hasNext()) {
     var f = it.next();
-    var name = f.getName();
-    if (!/\.xlsx$/i.test(name)) continue;
-    seen++;
+    if (!/\.xlsx$/i.test(f.getName())) continue;
+    candidates.push({ file: f, name: f.getName(), updated: f.getLastUpdated() });
+  }
+  candidates.sort(function (a, b) { return b.updated.getTime() - a.updated.getTime(); });
+
+  var best = { city: null, oblast: null };
+  var opened = 0;
+
+  for (var i = 0; i < candidates.length; i++) {
+    if (best.city && best.oblast) break;      // оба нашлись — дальше не разбираем
+    var c = candidates[i];
     var book;
+    opened++;
     try {
-      book = readWorkbook_(f.getBlob());
+      book = readWorkbook_(c.file.getBlob());
     } catch (e) {
-      Logger.log('Пропущен «' + name + '»: не читается как xlsx (' + e.message + ')');
+      Logger.log('Пропущен «' + c.name + '»: не читается как xlsx (' + e.message + ')');
       continue;
     }
     var kind = classify_(book);
     if (!kind) {
-      Logger.log('Пропущен «' + name + '»: не похож ни на один из двух ожидаемых отчётов');
+      Logger.log('Пропущен «' + c.name + '»: не похож ни на один из двух ожидаемых отчётов');
       continue;
     }
-    var when = f.getLastUpdated();
-    if (!best[kind] || when.getTime() > best[kind].updated.getTime()) {
-      best[kind] = { book: book, updated: when, name: name };
-    }
+    if (best[kind]) continue;                 // более свежий такой файл уже взят
+    best[kind] = { book: book, updated: c.updated, name: c.name };
   }
 
-  Logger.log('Просмотрено xlsx: ' + seen +
+  Logger.log('Файлов xlsx в папке: ' + candidates.length + ', разобрано: ' + opened +
              '; город: ' + (best.city ? best.city.name : '—') +
              '; область: ' + (best.oblast ? best.oblast.name : '—'));
   return best;
