@@ -1,0 +1,245 @@
+{
+ "date": "16.09.2026",
+ "totals": {
+  "schools": 113,
+  "pupils": 50725,
+  "ls": 45851,
+  "cards": 3343,
+  "parents": 6459,
+  "terminals": 135,
+  "menu": 103,
+  "sbs": 66,
+  "skudInst": 113,
+  "skudConn": 0,
+  "tariffsActive": 94,
+  "orders": 587
+ },
+ "cities": [
+  {
+   "name": "Гурьевск",
+   "schools": 12,
+   "pupils": 11624,
+   "ls": 8014,
+   "cards": 305,
+   "menu": 12
+  },
+  {
+   "name": "Черняховск",
+   "schools": 12,
+   "pupils": 4214,
+   "ls": 4557,
+   "cards": 709,
+   "menu": 10
+  },
+  {
+   "name": "Гвардейск",
+   "schools": 9,
+   "pupils": 2798,
+   "ls": 2262,
+   "cards": 69,
+   "menu": 8
+  },
+  {
+   "name": "Советск",
+   "schools": 9,
+   "pupils": 3223,
+   "ls": 4268,
+   "cards": 21,
+   "menu": 9
+  },
+  {
+   "name": "Багратионовск",
+   "schools": 8,
+   "pupils": 2883,
+   "ls": 2317,
+   "cards": 60,
+   "menu": 8
+  },
+  {
+   "name": "Зеленоградск",
+   "schools": 8,
+   "pupils": 3651,
+   "ls": 3403,
+   "cards": 449,
+   "menu": 8
+  },
+  {
+   "name": "Гусев",
+   "schools": 7,
+   "pupils": 3150,
+   "ls": 2861,
+   "cards": 100,
+   "menu": 7
+  },
+  {
+   "name": "Балтийск",
+   "schools": 5,
+   "pupils": 2818,
+   "ls": 3179,
+   "cards": 242,
+   "menu": 5
+  },
+  {
+   "name": "Неман",
+   "schools": 5,
+   "pupils": 1490,
+   "ls": 1480,
+   "cards": 168,
+   "menu": 4
+  },
+  {
+   "name": "Нестеров",
+   "schools": 5,
+   "pupils": 1024,
+   "ls": 1050,
+   "cards": 56,
+   "menu": 5
+  },
+  {
+   "name": "Озерск",
+   "schools": 5,
+   "pupils": 1095,
+   "ls": 1077,
+   "cards": 356,
+   "menu": 5
+  },
+  {
+   "name": "Полесск",
+   "schools": 5,
+   "pupils": 1699,
+   "ls": 1711,
+   "cards": 78,
+   "menu": 1
+  },
+  {
+   "name": "Правдинск",
+   "schools": 5,
+   "pupils": 1622,
+   "ls": 1672,
+   "cards": 160,
+   "menu": 5
+  },
+  {
+   "name": "Славск",
+   "schools": 5,
+   "pupils": 1402,
+   "ls": 1433,
+   "cards": 108,
+   "menu": 5
+  },
+  {
+   "name": "Светлогорск",
+   "schools": 3,
+   "pupils": 1695,
+   "ls": 1876,
+   "cards": 192,
+   "menu": 3
+  },
+  {
+   "name": "Светлый",
+   "schools": 3,
+   "pupils": 2471,
+   "ls": 694,
+   "cards": 31,
+   "menu": 3
+  },
+  {
+   "name": "Краснознаменск",
+   "schools": 2,
+   "pupils": 863,
+   "ls": 762,
+   "cards": 0,
+   "menu": 0
+  },
+  {
+   "name": "Мамоново",
+   "schools": 2,
+   "pupils": 770,
+   "ls": 951,
+   "cards": 161,
+   "menu": 2
+  },
+  {
+   "name": "Ладушкин",
+   "schools": 1,
+   "pupils": 461,
+   "ls": 463,
+   "cards": 11,
+   "menu": 1
+  },
+  {
+   "name": "Пионерский",
+   "schools": 1,
+   "pupils": 1428,
+   "ls": 1475,
+   "cards": 64,
+   "menu": 1
+  },
+  {
+   "name": "Янтарный (пгт)",
+   "schools": 1,
+   "pupils": 344,
+   "ls": 346,
+   "cards": 3,
+   "menu": 1
+  }
+ ],
+ "kshp": [
+  {
+   "name": "Новый уровень",
+   "schools": 71,
+   "pupils": 23052,
+   "ls": 23538,
+   "cards": 1724,
+   "menu": 61
+  },
+  {
+   "name": "МИТПРОДТОРГ",
+   "schools": 13,
+   "pupils": 8756,
+   "ls": 7570,
+   "cards": 532,
+   "menu": 13
+  },
+  {
+   "name": "Школьное питание",
+   "schools": 12,
+   "pupils": 11624,
+   "ls": 8014,
+   "cards": 305,
+   "menu": 12
+  },
+  {
+   "name": "Индивидуальный предприниматель Дараган Л",
+   "schools": 8,
+   "pupils": 2853,
+   "ls": 3086,
+   "cards": 332,
+   "menu": 8
+  },
+  {
+   "name": "УРА",
+   "schools": 7,
+   "pupils": 2510,
+   "ls": 2638,
+   "cards": 419,
+   "menu": 7
+  },
+  {
+   "name": "БАЛТИЙСКИЙ БРИЗ",
+   "schools": 1,
+   "pupils": 1141,
+   "ls": 765,
+   "cards": 30,
+   "menu": 1
+  },
+  {
+   "name": "Лицей №5",
+   "schools": 1,
+   "pupils": 789,
+   "ls": 240,
+   "cards": 1,
+   "menu": 1
+  }
+ ]
+}
