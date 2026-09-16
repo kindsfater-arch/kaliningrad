@@ -843,3 +843,79 @@ function notify_(err) {
     Logger.log('Не удалось отправить письмо: ' + e.message);
   }
 }
+
+/**
+ * Диагностика доступа к GitHub. Запускать из редактора, если сборка упала с 403.
+ * Ничего не публикует и не меняет — только читает и пишет вывод в журнал.
+ */
+function checkAccess() {
+  var token = cfg_('GITHUB_TOKEN');
+  if (!token) {
+    Logger.log('GITHUB_TOKEN не задан в свойствах скрипта (Настройки проекта → Свойства скрипта).');
+    return;
+  }
+
+  var opt = {
+    muteHttpExceptions: true,
+    headers: {
+      Authorization: 'Bearer ' + token,
+      Accept: 'application/vnd.github+json',
+      'X-GitHub-Api-Version': '2022-11-28'
+    }
+  };
+
+  var repo = cfg_('REPO');
+  var owner = repo.split('/')[0];
+  var lines = ['Репозиторий: ' + repo, 'Токен: ' + token.substring(0, 4) + '…, длина ' + token.length];
+
+  // Кому принадлежит токен и какого он вида
+  var me = UrlFetchApp.fetch('https://api.github.com/user', opt);
+  if (me.getResponseCode() === 401) {
+    Logger.log(lines.join('\n') + '\n\nТокен недействителен или просрочен. Создайте новый.');
+    return;
+  }
+  var login = null;
+  try { login = JSON.parse(me.getContentText()).login; } catch (e) {}
+  lines.push('Принадлежит учётной записи: ' + (login || '(не определить)'));
+
+  var head = me.getAllHeaders();
+  var scopes = head['x-oauth-scopes'];
+  if (scopes === undefined) scopes = head['X-OAuth-Scopes'];
+  var classic = (scopes !== undefined && scopes !== null);
+  lines.push('Вид токена: ' + (classic ? 'classic, права: ' + (scopes || '(ни одного)') : 'fine-grained'));
+
+  // Что разрешено в самом репозитории
+  var r = UrlFetchApp.fetch('https://api.github.com/repos/' + repo, opt);
+  var code = r.getResponseCode();
+  var canPush = null;
+  if (code === 200) {
+    var perms = (JSON.parse(r.getContentText()) || {}).permissions || {};
+    canPush = perms.push === true;
+    lines.push('Права на репозиторий: чтение ' + (perms.pull ? 'да' : 'нет') +
+               ', запись ' + (canPush ? 'да' : 'НЕТ') +
+               ', админ ' + (perms.admin ? 'да' : 'нет'));
+  } else {
+    lines.push('Репозиторий недоступен токену: HTTP ' + code);
+  }
+
+  // Вывод
+  lines.push('');
+  if (login && login !== owner) {
+    lines.push('ПРИЧИНА: токен создан под учётной записью «' + login + '», а репозиторий принадлежит «' + owner + '».');
+    lines.push('Войдите на GitHub как «' + owner + '» и создайте токен там.');
+  } else if (classic && !/(^|,)\s*(repo|public_repo)\s*(,|$)/.test(scopes || '')) {
+    lines.push('ПРИЧИНА: у classic-токена нет права «repo».');
+    lines.push('Либо отметьте «repo» при создании, либо сделайте fine-grained токен с Contents: Read and write.');
+  } else if (canPush === false) {
+    lines.push('ПРИЧИНА: токену разрешено только чтение.');
+    lines.push('Репозиторий публичный, поэтому читать может любой токен — сборка и дошла до записи.');
+    lines.push('Откройте страницу токена и проверьте два места:');
+    lines.push('  1. Repository access — репозиторий «' + repo + '» должен быть в списке выбранных.');
+    lines.push('  2. Permissions → Repository permissions → Contents = Read and write (не Read-only).');
+    lines.push('После правки прав токен менять не нужно — изменения действуют сразу.');
+  } else if (canPush === true) {
+    lines.push('Права на запись есть. Если сборка всё равно падает с 403, пришлите текст ошибки целиком.');
+  }
+
+  Logger.log(lines.join('\n'));
+}
