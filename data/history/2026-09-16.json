@@ -3,40 +3,40 @@
  "totals": {
   "schools": 113,
   "pupils": 50725,
-  "ls": 45851,
-  "cards": 3343,
-  "parents": 6459,
+  "ls": 45929,
+  "cards": 3488,
+  "parents": 6639,
   "terminals": 135,
-  "menu": 103,
-  "sbs": 66,
+  "menu": 105,
+  "sbs": 75,
   "skudInst": 113,
   "skudConn": 0,
-  "tariffsActive": 94,
-  "orders": 587
+  "tariffsActive": 102,
+  "orders": 633
  },
  "cities": [
   {
    "name": "Гурьевск",
    "schools": 12,
    "pupils": 11624,
-   "ls": 8014,
-   "cards": 305,
+   "ls": 8065,
+   "cards": 313,
    "menu": 12
   },
   {
    "name": "Черняховск",
    "schools": 12,
    "pupils": 4214,
-   "ls": 4557,
-   "cards": 709,
-   "menu": 10
+   "ls": 4508,
+   "cards": 732,
+   "menu": 12
   },
   {
    "name": "Гвардейск",
    "schools": 9,
    "pupils": 2798,
-   "ls": 2262,
-   "cards": 69,
+   "ls": 2258,
+   "cards": 81,
    "menu": 8
   },
   {
@@ -44,14 +44,14 @@
    "schools": 9,
    "pupils": 3223,
    "ls": 4268,
-   "cards": 21,
+   "cards": 22,
    "menu": 9
   },
   {
    "name": "Багратионовск",
    "schools": 8,
    "pupils": 2883,
-   "ls": 2317,
+   "ls": 2316,
    "cards": 60,
    "menu": 8
   },
@@ -59,32 +59,32 @@
    "name": "Зеленоградск",
    "schools": 8,
    "pupils": 3651,
-   "ls": 3403,
-   "cards": 449,
+   "ls": 3413,
+   "cards": 475,
    "menu": 8
   },
   {
    "name": "Гусев",
    "schools": 7,
    "pupils": 3150,
-   "ls": 2861,
-   "cards": 100,
+   "ls": 2886,
+   "cards": 112,
    "menu": 7
   },
   {
    "name": "Балтийск",
    "schools": 5,
    "pupils": 2818,
-   "ls": 3179,
-   "cards": 242,
+   "ls": 3180,
+   "cards": 243,
    "menu": 5
   },
   {
    "name": "Неман",
    "schools": 5,
    "pupils": 1490,
-   "ls": 1480,
-   "cards": 168,
+   "ls": 1477,
+   "cards": 172,
    "menu": 4
   },
   {
@@ -92,55 +92,55 @@
    "schools": 5,
    "pupils": 1024,
    "ls": 1050,
-   "cards": 56,
+   "cards": 61,
    "menu": 5
   },
   {
    "name": "Озерск",
    "schools": 5,
    "pupils": 1095,
-   "ls": 1077,
-   "cards": 356,
+   "ls": 1084,
+   "cards": 364,
    "menu": 5
   },
   {
    "name": "Полесск",
    "schools": 5,
    "pupils": 1699,
-   "ls": 1711,
-   "cards": 78,
+   "ls": 1717,
+   "cards": 80,
    "menu": 1
   },
   {
    "name": "Правдинск",
    "schools": 5,
    "pupils": 1622,
-   "ls": 1672,
-   "cards": 160,
+   "ls": 1675,
+   "cards": 163,
    "menu": 5
   },
   {
    "name": "Славск",
    "schools": 5,
    "pupils": 1402,
-   "ls": 1433,
-   "cards": 108,
+   "ls": 1435,
+   "cards": 111,
    "menu": 5
   },
   {
    "name": "Светлогорск",
    "schools": 3,
    "pupils": 1695,
-   "ls": 1876,
-   "cards": 192,
+   "ls": 1887,
+   "cards": 205,
    "menu": 3
   },
   {
    "name": "Светлый",
    "schools": 3,
    "pupils": 2471,
-   "ls": 694,
-   "cards": 31,
+   "ls": 696,
+   "cards": 33,
    "menu": 3
   },
   {
@@ -155,24 +155,24 @@
    "name": "Мамоново",
    "schools": 2,
    "pupils": 770,
-   "ls": 951,
-   "cards": 161,
+   "ls": 962,
+   "cards": 174,
    "menu": 2
   },
   {
    "name": "Ладушкин",
    "schools": 1,
    "pupils": 461,
-   "ls": 463,
-   "cards": 11,
+   "ls": 462,
+   "cards": 13,
    "menu": 1
   },
   {
    "name": "Пионерский",
    "schools": 1,
    "pupils": 1428,
-   "ls": 1475,
-   "cards": 64,
+   "ls": 1482,
+   "cards": 70,
    "menu": 1
   },
   {
@@ -180,7 +180,7 @@
    "schools": 1,
    "pupils": 344,
    "ls": 346,
-   "cards": 3,
+   "cards": 4,
    "menu": 1
   }
  ],
@@ -189,48 +189,48 @@
    "name": "Новый уровень",
    "schools": 71,
    "pupils": 23052,
-   "ls": 23538,
-   "cards": 1724,
-   "menu": 61
+   "ls": 23521,
+   "cards": 1794,
+   "menu": 63
   },
   {
    "name": "МИТПРОДТОРГ",
    "schools": 13,
    "pupils": 8756,
-   "ls": 7570,
-   "cards": 532,
+   "ls": 7591,
+   "cards": 555,
    "menu": 13
   },
   {
    "name": "Школьное питание",
    "schools": 12,
    "pupils": 11624,
-   "ls": 8014,
-   "cards": 305,
+   "ls": 8065,
+   "cards": 313,
    "menu": 12
   },
   {
    "name": "Индивидуальный предприниматель Дараган Л",
    "schools": 8,
    "pupils": 2853,
-   "ls": 3086,
-   "cards": 332,
+   "ls": 3099,
+   "cards": 350,
    "menu": 8
   },
   {
    "name": "УРА",
    "schools": 7,
    "pupils": 2510,
-   "ls": 2638,
-   "cards": 419,
+   "ls": 2643,
+   "cards": 442,
    "menu": 7
   },
   {
    "name": "БАЛТИЙСКИЙ БРИЗ",
    "schools": 1,
    "pupils": 1141,
-   "ls": 765,
-   "cards": 30,
+   "ls": 770,
+   "cards": 33,
    "menu": 1
   },
   {
