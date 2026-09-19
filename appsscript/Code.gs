@@ -164,7 +164,12 @@ function sanityOblast_(fresh, prev) {
   // Колонка читалась в прошлый раз и пропала — значит её переименовали.
   // Ловится сразу, независимо от того, какие в ней были значения.
   var reported = {};
-  if (prev.found) {
+  if (prev.found && !fresh.found) {
+    // Список колонок пишется начиная с версии, где СКУД разведён на три стадии.
+    // Его отсутствие означает, что в Apps Script вставлен старый Code.gs.
+    problems.push('в Apps Script работает устаревшая версия Code.gs — ' +
+                  'скопируйте её заново из appsscript/Code.gs в репозитории');
+  } else if (prev.found) {
     for (key in prev.found) {
       if (!prev.found.hasOwnProperty(key) || !prev.found[key]) continue;
       if (fresh.found && fresh.found[key]) continue;
