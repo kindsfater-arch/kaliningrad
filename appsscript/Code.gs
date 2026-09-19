@@ -143,18 +143,39 @@ function citySales_(d) {
 var OBLAST_LABELS = {
   pupils: 'Кол-во учащихся', ls: 'Кол-во привязанных ЛС',
   cards: 'Общее кол-во привязанных карт', parents: 'Кол-во созданных ЛК Родителя',
-  terminals: 'Кол-во терминалов', menu: 'Признак наличия активного меню'
+  tariffs: 'Кол-во тарифов в школе', tariffsActive: 'Количество активных тарифов',
+  lsTariff: 'Кол-во ЛС, привязанных к тарифам', menu: 'Признак наличия активного меню',
+  complexes: 'Кол-во активных комплексов в меню', dishes: 'Кол-во активных блюд',
+  orders: 'Кол-во заявок на питание', sbs: 'Обновлено оборудование СБС',
+  terminals: 'Кол-во терминалов', skudInst: 'Установлено (СКУД)',
+  skudConn: 'Контроллеры подключены', skudSoft: 'ПО прогружено',
+  benefitSum: 'Сумма по льготным транзакциям', cardTx: 'Кол-во транзакций по картам'
 };
 
 function sanityOblast_(fresh, prev) {
   if (!prev || !prev.schools) return;
   var problems = [];
+  var key;
 
   if (prev.schools.length && fresh.schools.length < prev.schools.length * DROP_LIMIT) {
     problems.push('школ было ' + prev.schools.length + ', стало ' + fresh.schools.length);
   }
-  for (var key in OBLAST_LABELS) {
-    if (!OBLAST_LABELS.hasOwnProperty(key)) continue;
+
+  // Колонка читалась в прошлый раз и пропала — значит её переименовали.
+  // Ловится сразу, независимо от того, какие в ней были значения.
+  var reported = {};
+  if (prev.found) {
+    for (key in prev.found) {
+      if (!prev.found.hasOwnProperty(key) || !prev.found[key]) continue;
+      if (fresh.found && fresh.found[key]) continue;
+      reported[key] = true;
+      problems.push('колонка «' + (OBLAST_LABELS[key] || key) + '» пропала или переименована');
+    }
+  }
+
+  // Запасная проверка по значениям — на случай, если колонка на месте, а данных в ней нет
+  for (key in OBLAST_LABELS) {
+    if (!OBLAST_LABELS.hasOwnProperty(key) || reported[key]) continue;
     if (oblastSum_(prev.schools, key) > 0 && oblastSum_(fresh.schools, key) === 0) {
       problems.push('колонка «' + OBLAST_LABELS[key] + '» больше не читается');
     }
@@ -631,8 +652,15 @@ function parseOblast_(book, updated) {
     orders:        findCol_(H, ['кол-во заявок на питание']),
     sbs:           findCol_(H, ['обновлено оборудование сбс']),
     terminals:     findCol_(H, ['кол-во терминалов']),
+    // СКУД проходит три стадии. В выгрузке до 17.09 было две колонки
+    // («Установлено», «Подключено»), с 18.09 — три, и вторая называется иначе.
+    // Новые названия идут первыми, старые оставлены как запасные.
     skudInst:      findCol_(H, ['установлено']),
-    skudConn:      findCol_(H, ['подключено'])
+    skudConn:      findCol_(H, ['контроллеры подключены', 'подключено']),
+    skudSoft:      findCol_(H, ['по прогружено', 'прогружено']),
+    // Появились с 18.09; в более старых файлах их нет
+    benefitSum:    findCol_(H, ['сумма по льготным транзакциям']),
+    cardTx:        findCol_(H, ['кол-во транзакций по картам'])
   };
 
   var schools = [];
@@ -658,13 +686,29 @@ function parseOblast_(book, updated) {
       terminals:     num_(row[C.terminals]),
       skudInst:      yes_(row[C.skudInst]),
       skudConn:      yes_(row[C.skudConn]),
+      skudSoft:      yes_(row[C.skudSoft]),
+      benefitSum:    num_(row[C.benefitSum]),
+      cardTx:        num_(row[C.cardTx]),
       kshpShort:     kshpShort_(row[C.kshp])
     });
   }
   if (!schools.length) throw new Error('В отчёте по области не найдено ни одной строки со школой');
 
   var date = toIso_(sheet.name) ? txt_(sheet.name) : ddmmyyyy_(updated);
-  return { updated: ddmmyyyy_(updated), date: date, schools: schools };
+  return { updated: ddmmyyyy_(updated), date: date, found: foundMap_(C), schools: schools };
+}
+
+/**
+ * Какие колонки удалось найти. Хранится в data/oblast.json и сверяется при следующей
+ * сборке: колонка, которая читалась вчера и пропала сегодня, означает переименование.
+ * Проверка по названию, а не по значениям, — единственная, что ловит такое сразу.
+ * Так «Подключено» превратилось в «Контроллеры подключены», и дашборд несколько дней
+ * показывал ноль подключённых СКУД, хотя подключены были все.
+ */
+function foundMap_(C) {
+  var out = {};
+  for (var key in C) if (C.hasOwnProperty(key)) out[key] = (C[key] >= 0);
+  return out;
 }
 
 /** «Багратионовск город» → «Багратионовск»; «Янтарный поселок городского типа» → «Янтарный (пгт)». */
@@ -778,17 +822,21 @@ function render_(tpl, data) {
 /** Агрегаты среза по области — то, из чего строятся графики динамики. */
 function snapshot_(o) {
   var t = { schools: 0, pupils: 0, ls: 0, cards: 0, parents: 0, terminals: 0,
-            menu: 0, sbs: 0, skudInst: 0, skudConn: 0, tariffsActive: 0, orders: 0 };
+            menu: 0, sbs: 0, skudInst: 0, skudConn: 0, skudSoft: 0, skudFull: 0,
+            tariffsActive: 0, orders: 0, benefitSum: 0, cardTx: 0 };
   var byCity = {}, byKshp = {};
 
   for (var i = 0; i < o.schools.length; i++) {
     var s = o.schools[i];
     t.schools++; t.pupils += s.pupils; t.ls += s.ls; t.cards += s.cards;
     t.parents += s.parents; t.terminals += s.terminals; t.orders += s.orders;
+    t.benefitSum += (s.benefitSum || 0); t.cardTx += (s.cardTx || 0);
     if (s.menu) t.menu++;
     if (s.sbs) t.sbs++;
     if (s.skudInst) t.skudInst++;
     if (s.skudConn) t.skudConn++;
+    if (s.skudSoft) t.skudSoft++;
+    if (s.skudInst && s.skudConn && s.skudSoft) t.skudFull++;
     if (s.tariffsActive > 0) t.tariffsActive++;
 
     var g = byCity[s.city] || (byCity[s.city] = { name: s.city, schools: 0, pupils: 0, ls: 0, cards: 0, menu: 0 });

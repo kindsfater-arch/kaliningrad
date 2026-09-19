@@ -312,7 +312,8 @@ footer{color:var(--muted); font-size:11.5px; margin-top:18px; text-align:center}
         <option value="nocards">Без привязанных карт</option>
         <option value="nomenu">Без активного меню</option>
         <option value="orders">С заявками на питание</option>
-        <option value="skud">Со СКУД</option>
+        <option value="skudfull">СКУД работает полностью</option>
+        <option value="skudnosoft">СКУД без прогруженного ПО</option>
       </select>
     </div>
     <div class="tblwrap">
@@ -371,6 +372,9 @@ const gapSchools = SCHOOLS.filter(s=>s.gaps>0).length;
 const OS = OBL.schools;
 OS.forEach(r => r.pct = r.pupils ? r.cards/r.pupils*100 : 0);
 const sum = (arr,f) => arr.reduce((a,x)=>a+f(x),0);
+// СКУД считается рабочим, только когда пройдены все три стадии:
+// оборудование установлено, контроллеры подключены, ПО прогружено.
+const skudFull = r => !!(r.skudInst && r.skudConn && r.skudSoft);
 const O = {
   n: OS.length,
   cities: [...new Set(OS.map(r=>r.city))],
@@ -380,6 +384,8 @@ const O = {
   sbs: OS.filter(r=>r.sbs).length,
   skudInst: OS.filter(r=>r.skudInst).length,
   skudConn: OS.filter(r=>r.skudConn).length,
+  skudSoft: OS.filter(r=>r.skudSoft).length,
+  skudFull: OS.filter(skudFull).length,
   terminals: sum(OS,r=>r.terminals),
   orders: sum(OS,r=>r.orders),
   noCards: OS.filter(r=>r.cards===0).length,
@@ -389,14 +395,14 @@ const byCity = {};
 OS.forEach(r => {
   const a = byCity[r.city] || (byCity[r.city] = {city:r.city,n:0,pupils:0,cards:0,parents:0,menu:0,sbs:0,skud:0,term:0});
   a.n++; a.pupils+=r.pupils; a.cards+=r.cards; a.parents+=r.parents;
-  a.menu += r.menu?1:0; a.sbs += r.sbs?1:0; a.skud += r.skudInst?1:0; a.term += r.terminals;
+  a.menu += r.menu?1:0; a.sbs += r.sbs?1:0; a.skud += skudFull(r)?1:0; a.term += r.terminals;
 });
 const CITIES = Object.values(byCity).sort((a,b)=>b.cards-a.cards);
 const byKshp = {};
 OS.forEach(r => {
   const a = byKshp[r.kshpShort] || (byKshp[r.kshpShort] = {name:r.kshpShort,n:0,pupils:0,cards:0,menu:0,sbs:0,skud:0,orders:0});
   a.n++; a.pupils+=r.pupils; a.cards+=r.cards;
-  a.menu += r.menu?1:0; a.sbs += r.sbs?1:0; a.skud += r.skudInst?1:0; a.orders += r.orders;
+  a.menu += r.menu?1:0; a.sbs += r.sbs?1:0; a.skud += skudFull(r)?1:0; a.orders += r.orders;
 });
 const KSHP = Object.values(byKshp).sort((a,b)=>b.n-a.n);
 
@@ -627,7 +633,9 @@ document.getElementById('oblKpis').innerHTML = [
   ['Привязано карт', fmt(O.cards), pct(O.cards,O.pupils)+' от '+fmt(O.pupils)+' учащихся', 'bad'],
   ['ЛК родителей создано', fmt(O.parents), pct(O.parents,O.pupils)+' от числа учащихся', 'wn'],
   ['Школы с активным меню', O.menu+' из '+O.n, (O.n-O.menu)+' '+plural(O.n-O.menu,'школа','школы','школ')+' без меню', (O.n-O.menu)?'wn':''],
-  ['СКУД подключён', O.skudConn+' из '+O.n, 'установлен в '+O.skudInst+', терминалов '+O.terminals, 'bad']
+  ['СКУД работает полностью', O.skudFull+' из '+O.n,
+    'установлен в '+O.skudInst+', контроллеры подключены в '+O.skudConn+', ПО прогружено в '+O.skudSoft,
+    O.skudFull===O.n ? 'up' : 'bad']
 ].map(([l,v,n,c])=>`<div class="kpi"><div class="lab">${l}</div><div class="val">${v}</div><div class="note ${c}">${n}</div></div>`).join('');
 
 let filterCity = null;
@@ -650,8 +658,9 @@ function renderOblCityBars(){
 document.getElementById('oblMeters').innerHTML = [
   ['Активное меню на текущую дату', O.menu, O.n, 'good'],
   ['Оборудование СБС обновлено', O.sbs, O.n, 'warn'],
-  ['СКУД установлен', O.skudInst, O.n, 'warn'],
-  ['СКУД подключён', O.skudConn, O.n, 'bad'],
+  ['СКУД: оборудование установлено', O.skudInst, O.n, O.skudInst===O.n ? 'good' : 'warn'],
+  ['СКУД: контроллеры подключены', O.skudConn, O.n, O.skudConn===O.n ? 'good' : 'warn'],
+  ['СКУД: ПО прогружено', O.skudSoft, O.n, O.skudSoft===O.n ? 'good' : 'bad'],
   ['Школы с привязанными картами', O.n-O.noCards, O.n, 'warn'],
   ['Школы с заявками на питание', O.withOrders, O.n, 'bad']
 ].map(([l,v,t,c])=>`<div class="meter ${c}">
@@ -667,7 +676,7 @@ function renderKshp(){
   src.forEach(r=>{
     const a = agg[r.kshpShort] || (agg[r.kshpShort]={name:r.kshpShort,n:0,pupils:0,cards:0,menu:0,sbs:0,skud:0,orders:0});
     a.n++; a.pupils+=r.pupils; a.cards+=r.cards;
-    a.menu += r.menu?1:0; a.sbs += r.sbs?1:0; a.skud += r.skudInst?1:0; a.orders += r.orders;
+    a.menu += r.menu?1:0; a.sbs += r.sbs?1:0; a.skud += skudFull(r)?1:0; a.orders += r.orders;
   });
   const rows = Object.values(agg).sort((a,b)=>b.n-a.n);
   document.querySelector('#kshpTable tbody').innerHTML = rows.map(k=>`
@@ -696,13 +705,15 @@ function renderOblTable(){
   if(only==='nocards') rows = rows.filter(r=>r.cards===0);
   if(only==='nomenu') rows = rows.filter(r=>!r.menu);
   if(only==='orders') rows = rows.filter(r=>r.orders>0);
-  if(only==='skud') rows = rows.filter(r=>r.skudInst);
+  if(only==='skudfull') rows = rows.filter(skudFull);
+  if(only==='skudnosoft') rows = rows.filter(r=>r.skudConn && !r.skudSoft);
   rows.sort((a,b)=> (typeof a[oSortK]==='string' ? a[oSortK].localeCompare(b[oSortK],'ru') : a[oSortK]-b[oSortK]) * oSortDir);
   document.querySelector('#oblTable tbody').innerHTML = rows.length ? rows.map(r=>{
     const eq = [];
     if(r.terminals) eq.push(`<span class="chip na">терм. ${r.terminals}</span>`);
     if(r.sbs) eq.push('<span class="chip ok">СБС</span>');
-    if(r.skudConn) eq.push('<span class="chip ok">СКУД вкл.</span>');
+    if(skudFull(r)) eq.push('<span class="chip ok">СКУД работает</span>');
+    else if(r.skudConn) eq.push('<span class="chip wn">СКУД без ПО</span>');
     else if(r.skudInst) eq.push('<span class="chip wn">СКУД уст.</span>');
     return `<tr><td class="sch">${r.school}</td><td class="op">${r.city}</td><td class="op">${r.kshpShort}</td>
       <td class="num">${fmt(r.pupils)}</td><td class="num">${fmt(r.cards)}</td>
@@ -731,7 +742,13 @@ const oblItems = [
   ['c','Карты почти не привязаны', `${fmt(O.cards)} карт на ${fmt(O.pupils)} учащихся — ${pct(O.cards,O.pupils)}. В ${O.noCards} школах из ${O.n} нет ни одной привязанной карты.` +
      (zeroCardCities.length ? ' Полностью без карт: ' + zeroCardCities.map(c=>c.city).join(', ') + '.' : '') +
      (lowCards.length ? li(lowCards.slice(0,6).map(c=>`${c.city} — ${c.cards} карт на ${fmt(c.pupils)} учащихся (${pct(c.cards,c.pupils)})`)) : '')],
-  ['c','СКУД фактически не работает', `Установлен в ${O.skudInst} школах из ${O.n}, подключён — в ${O.skudConn}. Данные Минобра. Терминалов питания установлено ${O.terminals}.`],
+  [O.skudFull===O.n ? 'i' : 'c', O.skudFull===O.n ? 'СКУД работает везде' : 'СКУД доведён до конца не везде',
+    `Три стадии: оборудование установлено — ${O.skudInst} ${plural(O.skudInst,'школа','школы','школ')} из ${O.n}, ` +
+    `контроллеры подключены — ${O.skudConn}, ПО прогружено — ${O.skudSoft}. ` +
+    `Полностью работает в ${O.skudFull} ${plural(O.skudFull,'школе','школах','школах')} из ${O.n}.` +
+    (O.skudFull && O.skudFull <= 12 ? li(OS.filter(skudFull).map(r=>`${r.school} — ${r.city}`)) : '') +
+    (O.skudFull < O.n ? ` Узкое место — прогрузка ПО: осталось ${O.n-O.skudSoft} ${plural(O.n-O.skudSoft,'школа','школы','школ')}.` : '') +
+    ` Данные Минобра. Терминалов питания установлено ${O.terminals}.`],
   ['w','Школы без активного меню', `${O.n-O.menu} ${plural(O.n-O.menu,'школа','школы','школ')}:` + li(noMenuCities.map(c=>`${c.city} — ${c.n-c.menu} из ${c.n}`))],
   ['w','Заявки на питание почти не подаются', `${fmt(O.orders)} заявок всего, только в ${O.withOrders} школах из ${O.n}. Меню заведено, но родители через систему не заказывают.`],
   ['i','Что уже сделано', `Лицевые счета привязаны почти везде: ${fmt(O.ls)} ЛС — ${pct(O.ls,O.pupils)} от числа учащихся. Активных тарифов ${fmt(sum(OS,r=>r.tariffsActive))} из ${fmt(sum(OS,r=>r.tariffs))} заведённых, активных блюд в меню ${fmt(sum(OS,r=>r.dishes))}, комплексов ${fmt(sum(OS,r=>r.complexes))}. Узкое место — не настройка системы, а выдача и привязка карт.`]

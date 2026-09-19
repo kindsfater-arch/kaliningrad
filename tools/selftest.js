@@ -79,6 +79,19 @@ throws('колонка учащихся перестала читаться',
 throws('школы массово пропали',
   () => sanityOblast({ schools: [school()] }, prevObl),
   'школ было 5, стало 1');
+
+// структурный заслон: колонка читалась вчера и пропала сегодня
+const withFound = (found, extra) => ({ schools: prevObl.schools.map(s => Object.assign({}, s, extra)), found: found });
+const foundAll = { pupils: true, skudConn: true, skudSoft: true };
+throws('колонку СКУД переименовали',
+  () => sanityOblast(withFound({ pupils: true, skudConn: false, skudSoft: true }), withFound(foundAll)),
+  'колонка «Контроллеры подключены» пропала или переименована');
+check('колонка на месте — претензий нет',
+  sanityOblast(withFound(foundAll), withFound(foundAll)), undefined);
+check('новая колонка, которой раньше не было, не считается пропажей',
+  sanityOblast(withFound(foundAll), withFound({ pupils: true, skudConn: true, skudSoft: false })), undefined);
+check('о пропаже сообщается один раз, а не дважды',
+  (() => { try { sanityOblast(withFound({ pupils: true, skudConn: false, skudSoft: true }, { skudConn: false }), withFound(foundAll)); } catch (e) { return (e.message.match(/Контроллеры подключены/g) || []).length; } })(), 1);
 check('спад в пределах нормы не мешает',
   sanityOblast({ schools: prevObl.schools.slice(0, 4) }, prevObl), undefined);
 

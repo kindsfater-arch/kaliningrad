@@ -10,9 +10,13 @@
   "menu": 104,
   "sbs": 76,
   "skudInst": 113,
-  "skudConn": 0,
+  "skudConn": 113,
+  "skudSoft": 2,
+  "skudFull": 2,
   "tariffsActive": 98,
-  "orders": 308
+  "orders": 308,
+  "benefitSum": 1005341.5,
+  "cardTx": 3390
  },
  "cities": [
   {
