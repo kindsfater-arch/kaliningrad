@@ -98,6 +98,11 @@ function collect_() {
 //
 // Порог намеренно щадящий (спад более чем на 30%): задача — поймать развал
 // разбора, а не следить за самими данными.
+//
+// Заслон охраняет то, что видно на странице. Колонка, которую дашборд не
+// показывает, при пропаже пишется в лог и публикацию не отменяет: нулей вместо
+// настоящих чисел на сайте от неё не появится, а останавливать из-за такой
+// колонки всю сборку значит морозить дашборд без причины.
 
 var DROP_LIMIT = 0.7;
 
@@ -152,9 +157,22 @@ var OBLAST_LABELS = {
   benefitSum: 'Сумма по льготным транзакциям', cardTx: 'Кол-во транзакций по картам'
 };
 
+/**
+ * Колонки, которые разбираются про запас, но на дашборд не выводятся.
+ * Их пропажа ничего не искажает, поэтому она попадает в лог, а не отменяет публикацию.
+ * Так 21.09 поставщик убрал из выгрузки «Сумма по льготным транзакциям» и
+ * «Кол-во транзакций по картам», и сборка встала, хотя показывать их всё равно негде.
+ * Колонку, которая появится на странице, нужно отсюда убрать — иначе её пропажу
+ * заслон пропустит.
+ */
+var OBLAST_UNUSED = {
+  lsTariff: true, benefitSum: true, cardTx: true
+};
+
 function sanityOblast_(fresh, prev) {
   if (!prev || !prev.schools) return;
-  var problems = [];
+  var problems = [];   // отменяют публикацию
+  var notes = [];      // только в лог: дашборд этих колонок не показывает
   var key;
 
   if (prev.schools.length && fresh.schools.length < prev.schools.length * DROP_LIMIT) {
@@ -174,18 +192,23 @@ function sanityOblast_(fresh, prev) {
       if (!prev.found.hasOwnProperty(key) || !prev.found[key]) continue;
       if (fresh.found && fresh.found[key]) continue;
       reported[key] = true;
-      problems.push('колонка «' + (OBLAST_LABELS[key] || key) + '» пропала или переименована');
+      (OBLAST_UNUSED[key] ? notes : problems)
+        .push('колонка «' + (OBLAST_LABELS[key] || key) + '» пропала или переименована');
     }
   }
 
   // Запасная проверка по значениям — на случай, если колонка на месте, а данных в ней нет
   for (key in OBLAST_LABELS) {
-    if (!OBLAST_LABELS.hasOwnProperty(key) || reported[key]) continue;
+    if (!OBLAST_LABELS.hasOwnProperty(key) || reported[key] || OBLAST_UNUSED[key]) continue;
     if (oblastSum_(prev.schools, key) > 0 && oblastSum_(fresh.schools, key) === 0) {
       problems.push('колонка «' + OBLAST_LABELS[key] + '» больше не читается');
     }
   }
 
+  if (notes.length) {
+    Logger.log('Область: ' + notes.join('; ') +
+               '. На дашборде эти колонки не выводятся — публикация продолжается.');
+  }
   refuse_('область', problems);
 }
 

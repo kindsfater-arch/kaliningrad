@@ -9,7 +9,9 @@ const vm = require('vm');
 const fs = require('fs');
 const path = require('path');
 
-const sandbox = { console, Math, JSON, String, Number, Array, Object, RegExp, Date, isNaN, parseInt, parseFloat, Error };
+const logged = [];
+const Logger = { log: msg => logged.push(String(msg)) };
+const sandbox = { console, Logger, Math, JSON, String, Number, Array, Object, RegExp, Date, isNaN, parseInt, parseFloat, Error };
 vm.createContext(sandbox);
 vm.runInContext(fs.readFileSync(path.join(__dirname, '..', 'appsscript', 'Code.gs'), 'utf8'), sandbox, { filename: 'Code.gs' });
 const g = name => vm.runInContext(name, sandbox);
@@ -94,6 +96,22 @@ check('о пропаже сообщается один раз, а не дваж�
   (() => { try { sanityOblast(withFound({ pupils: true, skudConn: false, skudSoft: true }, { skudConn: false }), withFound(foundAll)); } catch (e) { return (e.message.match(/Контроллеры подключены/g) || []).length; } })(), 1);
 check('спад в пределах нормы не мешает',
   sanityOblast({ schools: prevObl.schools.slice(0, 4) }, prevObl), undefined);
+
+// колонки, которых нет на дашборде: пропажа только в лог, публикация идёт дальше
+const foundWide = { pupils: true, skudConn: true, benefitSum: true, cardTx: true, lsTariff: true };
+const foundNarrow = { pupils: true, skudConn: true, benefitSum: false, cardTx: false, lsTariff: false };
+logged.length = 0;
+check('пропажа колонки, которой нет на дашборде, не отменяет публикацию',
+  sanityOblast(withFound(foundNarrow), withFound(foundWide)), undefined);
+check('о ней всё же сообщается в лог',
+  logged.length === 1 && /Сумма по льготным транзакциям/.test(logged[0]) &&
+  /Кол-во транзакций по картам/.test(logged[0]), true);
+throws('пропажа показываемой колонки по-прежнему останавливает сборку',
+  () => sanityOblast(withFound({ pupils: true, skudConn: false, benefitSum: true, cardTx: true, lsTariff: true }),
+                     withFound(foundWide)),
+  'колонка «Контроллеры подключены» пропала или переименована');
+check('обнуление колонки, которой нет на дашборде, тоже не мешает',
+  sanityOblast(withFound(foundWide, { benefitSum: 0 }), withFound(foundWide, { benefitSum: 500 })), undefined);
 
 const op = n => ({ schools: Array.from({ length: n }, () => ({ sales: [10, 20] })) });
 const zeroed = n => ({ schools: Array.from({ length: n }, () => ({ sales: [0, 0] })) });
