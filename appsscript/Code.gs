@@ -90,19 +90,19 @@ function collect_() {
 
 // ────────────────── Заслон от тихой порчи данных ──────────────────
 //
-// Обязательными сделаны только те колонки, без которых разбор бессмыслен.
-// Остальные необязательны: если такую колонку переименуют, разбор не упадёт,
-// а молча подставит нули — и опубликует. Поэтому результат сверяется с прошлой
-// опубликованной версией: обвал количества строк или обнуление показателя,
-// который раньше был ненулевым, означает, что структура выгрузки изменилась.
+// Обязательными сделаны только три колонки, без которых разбор бессмыслен:
+// город, краткое название школы, название КШП. Остальные необязательны —
+// если такую колонку переименуют, разбор не упадёт, а подставит нули.
 //
-// Порог намеренно щадящий (спад более чем на 30%): задача — поймать развал
-// разбора, а не следить за самими данными.
+// Чтобы нули не ушли на страницу как настоящие числа, вместе с данными
+// публикуется список найденных колонок (`found`). Дашборд читает его и там,
+// где колонки не было, пишет «нет в выгрузке» вместо цифры. Поэтому пропажа
+// колонки публикацию не отменяет — она уходит в лог и видна на самой странице.
 //
-// Заслон охраняет то, что видно на странице. Колонка, которую дашборд не
-// показывает, при пропаже пишется в лог и публикацию не отменяет: нулей вместо
-// настоящих чисел на сайте от неё не появится, а останавливать из-за такой
-// колонки всю сборку значит морозить дашборд без причины.
+// Отменяют публикацию только те случаи, где соврать всё-таки можно:
+// обвал количества строк и обнуление показателя, который раньше был ненулевым
+// при живой колонке. Порог намеренно щадящий (спад более чем на 30%):
+// задача — поймать развал разбора, а не следить за самими данными.
 
 var DROP_LIMIT = 0.7;
 
@@ -146,41 +146,36 @@ function citySales_(d) {
 }
 
 var OBLAST_LABELS = {
-  pupils: 'Кол-во учащихся', ls: 'Кол-во привязанных ЛС',
-  cards: 'Общее кол-во привязанных карт', parents: 'Кол-во созданных ЛК Родителя',
+  pupils: 'Кол-во учащихся',
+  ls: 'Кол-во привязанных ЛС', teachers: 'Кол-во учителей',
+  cards: 'Общее кол-во привязанных карт', mifare: 'Кол-во привязанных карт MIFARE',
+  hmac: 'Кол-во привязанных БК (HMAC)', parents: 'Кол-во созданных ЛК Родителя',
+  kj: 'Признак подключения интеграции с КЖ',
   tariffs: 'Кол-во тарифов в школе', tariffsActive: 'Количество активных тарифов',
-  lsTariff: 'Кол-во ЛС, привязанных к тарифам', menu: 'Признак наличия активного меню',
-  complexes: 'Кол-во активных комплексов в меню', dishes: 'Кол-во активных блюд',
-  orders: 'Кол-во заявок на питание', sbs: 'Обновлено оборудование СБС',
-  terminals: 'Кол-во терминалов', skudInst: 'Установлено (СКУД)',
-  skudConn: 'Контроллеры подключены', skudSoft: 'ПО прогружено',
-  benefitSum: 'Сумма по льготным транзакциям', cardTx: 'Кол-во транзакций по картам'
-};
-
-/**
- * Колонки, которые разбираются про запас, но на дашборд не выводятся.
- * Их пропажа ничего не искажает, поэтому она попадает в лог, а не отменяет публикацию.
- * Так 21.09 поставщик убрал из выгрузки «Сумма по льготным транзакциям» и
- * «Кол-во транзакций по картам», и сборка встала, хотя показывать их всё равно негде.
- * Колонку, которая появится на странице, нужно отсюда убрать — иначе её пропажу
- * заслон пропустит.
- */
-var OBLAST_UNUSED = {
-  lsTariff: true, benefitSum: true, cardTx: true
+  lsTariff: 'Кол-во ЛС, привязанных к тарифам',
+  menu: 'Признак наличия активного меню', complexes: 'Кол-во активных комплексов в меню',
+  complexesTariff: 'Кол-во активных комплексов с привязанными тарифами',
+  dishes: 'Кол-во активных блюд', orders: 'Кол-во заявок на питание',
+  sbs: 'Обновлено оборудование СБС', terminals: 'Кол-во терминалов',
+  skudInst: 'Установлено (СКУД)', skudConn: 'Контроллеры подключены',
+  skudSoft: 'ПО прогружено',
+  spend: 'Сумма списаний за питание', cardTx: 'Кол-во транзакций по картам'
 };
 
 function sanityOblast_(fresh, prev) {
   if (!prev || !prev.schools) return;
   var problems = [];   // отменяют публикацию
-  var notes = [];      // только в лог: дашборд этих колонок не показывает
+  var notes = [];      // только в лог: страница про такую колонку скажет сама
   var key;
 
   if (prev.schools.length && fresh.schools.length < prev.schools.length * DROP_LIMIT) {
     problems.push('школ было ' + prev.schools.length + ', стало ' + fresh.schools.length);
   }
 
-  // Колонка читалась в прошлый раз и пропала — значит её переименовали.
-  // Ловится сразу, независимо от того, какие в ней были значения.
+  // Колонка читалась в прошлый раз и не нашлась сегодня — её переименовали или убрали.
+  // Публикацию это не отменяет: список найденных колонок уезжает на страницу, и там,
+  // где колонки нет, дашборд пишет «нет в выгрузке» вместо числа. Соврать нечем,
+  // а останавливать из-за этого всю сборку значит морозить и все остальные цифры.
   var reported = {};
   if (prev.found && !fresh.found) {
     // Список колонок пишется начиная с версии, где СКУД разведён на три стадии.
@@ -192,14 +187,15 @@ function sanityOblast_(fresh, prev) {
       if (!prev.found.hasOwnProperty(key) || !prev.found[key]) continue;
       if (fresh.found && fresh.found[key]) continue;
       reported[key] = true;
-      (OBLAST_UNUSED[key] ? notes : problems)
-        .push('колонка «' + (OBLAST_LABELS[key] || key) + '» пропала или переименована');
+      notes.push('колонка «' + (OBLAST_LABELS[key] || key) + '» пропала или переименована');
     }
   }
 
-  // Запасная проверка по значениям — на случай, если колонка на месте, а данных в ней нет
+  // А вот это отменяет публикацию: колонка на месте, но все значения в ней обнулились.
+  // Отличить сломанный разбор от настоящего нуля здесь нельзя, и ноль на странице
+  // выглядит как настоящее число — поэтому пусть посмотрит человек.
   for (key in OBLAST_LABELS) {
-    if (!OBLAST_LABELS.hasOwnProperty(key) || reported[key] || OBLAST_UNUSED[key]) continue;
+    if (!OBLAST_LABELS.hasOwnProperty(key) || reported[key]) continue;
     if (oblastSum_(prev.schools, key) > 0 && oblastSum_(fresh.schools, key) === 0) {
       problems.push('колонка «' + OBLAST_LABELS[key] + '» больше не читается');
     }
@@ -207,7 +203,7 @@ function sanityOblast_(fresh, prev) {
 
   if (notes.length) {
     Logger.log('Область: ' + notes.join('; ') +
-               '. На дашборде эти колонки не выводятся — публикация продолжается.');
+               '. На странице вместо чисел будет «нет в выгрузке» — публикация продолжается.');
   }
   refuse_('область', problems);
 }
@@ -664,31 +660,43 @@ function parseOblast_(book, updated) {
   var H = rows[hr];
 
   var C = {
-    city:          need_(findCol_(H, ['город']), 'Город'),
-    school:        need_(findCol_(H, ['краткое наименование школы']), 'Краткое наименование школы'),
-    kshp:          need_(findCol_(H, ['наименование кшп']), 'Наименование КШП'),
-    pupils:        findCol_(H, ['кол-во учащихся']),
-    ls:            findCol_(H, ['кол-во привязанных лс']),
-    cards:         findCol_(H, ['общее кол-во привязанных карт']),
-    parents:       findCol_(H, ['кол-во созданных лк родителя']),
-    tariffs:       findCol_(H, ['кол-во тарифов в школе']),
-    tariffsActive: findCol_(H, ['количество активных тарифов']),
-    lsTariff:      findCol_(H, ['кол-во лс, привязанных к тарифам']),
-    menu:          findCol_(H, ['признак наличия активного меню']),
-    complexes:     findCol_(H, ['кол-во активных комплексов в меню']),
-    dishes:        findCol_(H, ['кол-во активных блюд']),
-    orders:        findCol_(H, ['кол-во заявок на питание']),
-    sbs:           findCol_(H, ['обновлено оборудование сбс']),
-    terminals:     findCol_(H, ['кол-во терминалов']),
-    // СКУД проходит три стадии. В выгрузке до 17.09 было две колонки
+    schoolId:        findCol_(H, ['id школы']),
+    inn:             findCol_(H, ['инн']),
+    city:            need_(findCol_(H, ['город']), 'Город'),
+    school:          need_(findCol_(H, ['краткое наименование школы']), 'Краткое наименование школы'),
+    kshpId:          findCol_(H, ['id кшп']),
+    kshp:            need_(findCol_(H, ['наименование кшп']), 'Наименование КШП'),
+    pupils:          findCol_(H, ['кол-во учащихся']),
+    // Задачи школы
+    ls:              findCol_(H, ['кол-во привязанных лс']),
+    teachers:        findCol_(H, ['кол-во учителей']),
+    cards:           findCol_(H, ['общее кол-во привязанных карт']),
+    mifare:          findCol_(H, ['кол-во привязанных карт mifare']),
+    hmac:            findCol_(H, ['кол-во привязанных бк (hmac)', 'кол-во привязанных бк']),
+    parents:         findCol_(H, ['кол-во созданных лк родителя']),
+    kj:              findCol_(H, ['признак подключения интеграции с кж', 'признак подключения интеграции с']),
+    tariffs:         findCol_(H, ['кол-во тарифов в школе']),
+    tariffsActive:   findCol_(H, ['количество активных тарифов']),
+    lsTariff:        findCol_(H, ['кол-во лс, привязанных к тарифам']),
+    // Задачи организатора питания
+    menu:            findCol_(H, ['признак наличия активного меню']),
+    complexes:       findCol_(H, ['кол-во активных комплексов в меню']),
+    complexesTariff: findCol_(H, ['кол-во активных комплексов с привя']),
+    dishes:          findCol_(H, ['кол-во активных блюд']),
+    orders:          findCol_(H, ['кол-во заявок на питание']),
+    // Оборудование питания
+    sbs:             findCol_(H, ['обновлено оборудование сбс']),
+    terminals:       findCol_(H, ['кол-во терминалов']),
+    // Оборудование СКУД проходит три стадии. В выгрузке до 17.09 колонок было две
     // («Установлено», «Подключено»), с 18.09 — три, и вторая называется иначе.
     // Новые названия идут первыми, старые оставлены как запасные.
-    skudInst:      findCol_(H, ['установлено']),
-    skudConn:      findCol_(H, ['контроллеры подключены', 'подключено']),
-    skudSoft:      findCol_(H, ['по прогружено', 'прогружено']),
-    // Появились с 18.09; в более старых файлах их нет
-    benefitSum:    findCol_(H, ['сумма по льготным транзакциям']),
-    cardTx:        findCol_(H, ['кол-во транзакций по картам'])
+    skudInst:        findCol_(H, ['установлено']),
+    skudConn:        findCol_(H, ['контроллеры подключены', 'подключено']),
+    skudSoft:        findCol_(H, ['по прогружено', 'прогружено']),
+    // Транзакции. Появились 18.09, пропали 21.09, вернулись 23.09 уже под другими
+    // названиями: «Сумма по льготным транзакциям» → «Сумма списаний за питание».
+    spend:           findCol_(H, ['сумма списаний за питание']),
+    cardTx:          findCol_(H, ['кол-во транзакций по картам'])
   };
 
   var schools = [];
@@ -697,27 +705,40 @@ function parseOblast_(book, updated) {
     var school = txt_(row[C.school]);
     if (!school) continue;
     schools.push({
-      city:          cityShort_(row[C.city]),
-      school:        school,
-      pupils:        num_(row[C.pupils]),
-      ls:            num_(row[C.ls]),
-      cards:         num_(row[C.cards]),
-      parents:       num_(row[C.parents]),
-      tariffs:       num_(row[C.tariffs]),
-      tariffsActive: num_(row[C.tariffsActive]),
-      lsTariff:      num_(row[C.lsTariff]),
-      menu:          yes_(row[C.menu]),
-      complexes:     num_(row[C.complexes]),
-      dishes:        num_(row[C.dishes]),
-      orders:        num_(row[C.orders]),
-      sbs:           yes_(row[C.sbs]),
-      terminals:     num_(row[C.terminals]),
-      skudInst:      yes_(row[C.skudInst]),
-      skudConn:      yes_(row[C.skudConn]),
-      skudSoft:      yes_(row[C.skudSoft]),
-      benefitSum:    num_(row[C.benefitSum]),
-      cardTx:        num_(row[C.cardTx]),
-      kshpShort:     kshpShort_(row[C.kshp])
+      schoolId:        num_(row[C.schoolId]),
+      inn:             txt_(row[C.inn]),
+      city:            cityShort_(row[C.city]),
+      school:          school,
+      kshpId:          num_(row[C.kshpId]),
+      kshpShort:       kshpShort_(row[C.kshp]),
+      kshpFull:        txt_(row[C.kshp]),
+      pupils:          num_(row[C.pupils]),
+      // Задачи школы
+      ls:              num_(row[C.ls]),
+      teachers:        num_(row[C.teachers]),
+      cards:           num_(row[C.cards]),
+      mifare:          num_(row[C.mifare]),
+      hmac:            num_(row[C.hmac]),
+      parents:         num_(row[C.parents]),
+      kj:              yes_(row[C.kj]),
+      tariffs:         num_(row[C.tariffs]),
+      tariffsActive:   num_(row[C.tariffsActive]),
+      lsTariff:        num_(row[C.lsTariff]),
+      // Задачи организатора питания
+      menu:            yes_(row[C.menu]),
+      complexes:       num_(row[C.complexes]),
+      complexesTariff: num_(row[C.complexesTariff]),
+      dishes:          num_(row[C.dishes]),
+      orders:          num_(row[C.orders]),
+      // Оборудование
+      sbs:             yes_(row[C.sbs]),
+      terminals:       num_(row[C.terminals]),
+      skudInst:        yes_(row[C.skudInst]),
+      skudConn:        yes_(row[C.skudConn]),
+      skudSoft:        yes_(row[C.skudSoft]),
+      // Транзакции
+      spend:           num_(row[C.spend]),
+      cardTx:          num_(row[C.cardTx])
     });
   }
   if (!schools.length) throw new Error('В отчёте по области не найдено ни одной строки со школой');
@@ -851,14 +872,14 @@ function render_(tpl, data) {
 function snapshot_(o) {
   var t = { schools: 0, pupils: 0, ls: 0, cards: 0, parents: 0, terminals: 0,
             menu: 0, sbs: 0, skudInst: 0, skudConn: 0, skudSoft: 0, skudFull: 0,
-            tariffsActive: 0, orders: 0, benefitSum: 0, cardTx: 0 };
+            tariffsActive: 0, orders: 0, spend: 0, cardTx: 0 };
   var byCity = {}, byKshp = {};
 
   for (var i = 0; i < o.schools.length; i++) {
     var s = o.schools[i];
     t.schools++; t.pupils += s.pupils; t.ls += s.ls; t.cards += s.cards;
     t.parents += s.parents; t.terminals += s.terminals; t.orders += s.orders;
-    t.benefitSum += (s.benefitSum || 0); t.cardTx += (s.cardTx || 0);
+    t.spend += (s.spend || 0); t.cardTx += (s.cardTx || 0);
     if (s.menu) t.menu++;
     if (s.sbs) t.sbs++;
     if (s.skudInst) t.skudInst++;

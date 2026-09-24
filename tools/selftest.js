@@ -82,36 +82,34 @@ throws('школы массово пропали',
   () => sanityOblast({ schools: [school()] }, prevObl),
   'школ было 5, стало 1');
 
-// структурный заслон: колонка читалась вчера и пропала сегодня
+// структурный заслон: колонка читалась вчера и не нашлась сегодня.
+// Публикацию это не отменяет — страница сама скажет «нет в выгрузке».
 const withFound = (found, extra) => ({ schools: prevObl.schools.map(s => Object.assign({}, s, extra)), found: found });
 const foundAll = { pupils: true, skudConn: true, skudSoft: true };
-throws('колонку СКУД переименовали',
-  () => sanityOblast(withFound({ pupils: true, skudConn: false, skudSoft: true }), withFound(foundAll)),
-  'колонка «Контроллеры подключены» пропала или переименована');
+logged.length = 0;
+check('колонку СКУД переименовали — публикация продолжается',
+  sanityOblast(withFound({ pupils: true, skudConn: false, skudSoft: true }, { skudConn: false }), withFound(foundAll)),
+  undefined);
+check('о пропаже сообщается в лог',
+  logged.length === 1 && /Контроллеры подключены/.test(logged[0]), true);
+check('о пропаже сообщается один раз, а не дважды',
+  (logged[0].match(/Контроллеры подключены/g) || []).length, 1);
 check('колонка на месте — претензий нет',
   sanityOblast(withFound(foundAll), withFound(foundAll)), undefined);
 check('новая колонка, которой раньше не было, не считается пропажей',
   sanityOblast(withFound(foundAll), withFound({ pupils: true, skudConn: true, skudSoft: false })), undefined);
-check('о пропаже сообщается один раз, а не дважды',
-  (() => { try { sanityOblast(withFound({ pupils: true, skudConn: false, skudSoft: true }, { skudConn: false }), withFound(foundAll)); } catch (e) { return (e.message.match(/Контроллеры подключены/g) || []).length; } })(), 1);
 check('спад в пределах нормы не мешает',
   sanityOblast({ schools: prevObl.schools.slice(0, 4) }, prevObl), undefined);
 
-// колонки, которых нет на дашборде: пропажа только в лог, публикация идёт дальше
-const foundWide = { pupils: true, skudConn: true, benefitSum: true, cardTx: true, lsTariff: true };
-const foundNarrow = { pupils: true, skudConn: true, benefitSum: false, cardTx: false, lsTariff: false };
-logged.length = 0;
-check('пропажа колонки, которой нет на дашборде, не отменяет публикацию',
-  sanityOblast(withFound(foundNarrow), withFound(foundWide)), undefined);
-check('о ней всё же сообщается в лог',
-  logged.length === 1 && /Сумма по льготным транзакциям/.test(logged[0]) &&
-  /Кол-во транзакций по картам/.test(logged[0]), true);
-throws('пропажа показываемой колонки по-прежнему останавливает сборку',
-  () => sanityOblast(withFound({ pupils: true, skudConn: false, benefitSum: true, cardTx: true, lsTariff: true }),
-                     withFound(foundWide)),
-  'колонка «Контроллеры подключены» пропала или переименована');
-check('обнуление колонки, которой нет на дашборде, тоже не мешает',
-  sanityOblast(withFound(foundWide, { benefitSum: 0 }), withFound(foundWide, { benefitSum: 500 })), undefined);
+// а вот живая колонка, где всё обнулилось, сборку останавливает
+throws('колонка на месте, но обнулилась — сборка встаёт',
+  () => sanityOblast(withFound(foundAll, { cards: 0 }), withFound(foundAll)),
+  'колонка «Общее кол-во привязанных карт» больше не читается');
+throws('транзакции обнулились — сборка встаёт',
+  () => sanityOblast(withFound(foundAll, { spend: 0 }), withFound(foundAll, { spend: 500 })),
+  'колонка «Сумма списаний за питание» больше не читается');
+check('устаревший Code.gs в облаке опознаётся',
+  (() => { try { sanityOblast({ schools: prevObl.schools.slice() }, withFound(foundAll)); } catch (e) { return /устаревшая версия Code.gs/.test(e.message); } })(), true);
 
 const op = n => ({ schools: Array.from({ length: n }, () => ({ sales: [10, 20] })) });
 const zeroed = n => ({ schools: Array.from({ length: n }, () => ({ sales: [0, 0] })) });
