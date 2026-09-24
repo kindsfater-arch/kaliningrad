@@ -389,7 +389,7 @@ const DATA = {"city":{"updated":"22.09.2026","dates":["02.09","03.09","04.09","0
 const CITY = DATA.city, OBL = DATA.oblast;
 const D = CITY.dates, OPS = CITY.operators;
 
-const fmt = n => Math.round(n).toLocaleString('ru-RU');
+const fmt = n => Number.isFinite(Number(n)) ? Math.round(n).toLocaleString('ru-RU') : '—';
 const pct = (a,b) => b ? (100*a/b).toFixed(1).replace('.',',')+'%' : '—';
 const plural = (n, one, few, many) => {
   const a = Math.abs(n) % 100, b = a % 10;
@@ -423,10 +423,13 @@ const OS = OBL.schools;
 // переименовали или убрали, здесь будет false, и страница честно скажет
 // «нет в выгрузке» вместо нуля. Старые сборки поля found не писали — тогда
 // считаем, что на месте всё, иначе дашборд обнулится на пустом месте.
-const has = k => !OBL.found || OBL.found[k] !== false;
+// Ключа нет в found — значит данные собраны прежней версией Code.gs, которая
+// такую колонку ещё не читала. Это тоже «нет в выгрузке»: иначе на странице
+// вместо чисел появились бы NaN, пока в Apps Script не обновят скрипт.
+const has = k => OBL.found ? OBL.found[k] === true : true;
 const GONE = k => `<span class="chip na">нет в выгрузке</span>`;
 
-const sum = (arr,f) => arr.reduce((a,x)=>a+f(x),0);
+const sum = (arr,f) => arr.reduce((a,x)=>a+(Number(f(x))||0),0);
 // Мелкие суммы показываем с копейками: в выгрузке попадаются остатки
 // вроде −0,12 ₽, и округление до рубля превратило бы их в «-0 ₽».
 const money = n => (Math.abs(n) < 100 ? Number(n).toLocaleString('ru-RU',{maximumFractionDigits:2})
@@ -726,7 +729,7 @@ function renderStats(boxId, goneId, items){
   }).join('');
   const box = document.getElementById(goneId);
   box.hidden = !gone.length;
-  box.textContent = gone.length ? 'В выгрузке нет колонок: ' + gone.join(', ') + '. Числа появятся, когда поставщик вернёт их в отчёт.' : '';
+  box.textContent = gone.length ? 'Этих колонок нет в выгрузке: ' + gone.join(', ') + '. Числа появятся, когда колонки вернутся в отчёт.' : '';
 }
 
 renderStats('statSchool','goneSchool',[
@@ -855,7 +858,7 @@ function renderKshp(){
 const COLS = {
   school:          {t:'Школа', kind:'sch'},
   city:            {t:'Муниципалитет', kind:'op'},
-  kshpShort:       {t:'Оператор', kind:'op'},
+  kshpShort:       {t:'Оператор', kind:'op', src:'kshp'},
   kshpId:          {t:'ID КШП', kind:'num'},
   schoolId:        {t:'ID школы', kind:'num'},
   inn:             {t:'ИНН', kind:'op'},
