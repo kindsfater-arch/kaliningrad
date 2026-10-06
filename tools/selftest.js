@@ -120,5 +120,41 @@ throws('продажи обнулились',
   () => sanityCity({ operators: [zeroed(5), zeroed(5), zeroed(5)] }, prevCity),
   'все продажи обнулились');
 
+// ── три состояния «Да / Нет / нет данных» ──
+console.log('\nРазбор ячеек «Да/Нет»');
+const flag = g('flag_');
+check('«Да»', flag('Да'), true);
+check('«нет»', flag('нет'), false);
+check('«нет данных» — это не «Нет»', flag('нет данных'), null);
+check('«Нет данных» в любом регистре', flag('Нет данных'), null);
+check('пустая ячейка', flag(''), null);
+check('произвольный текст', flag('? Ремонт, в другом здании'), null);
+
+console.log('\nПризнак активного меню');
+const menuFlag = g('menuFlag_');
+check('прежнее «Да»', menuFlag('Да'), true);
+check('прежнее «Нет»', menuFlag('Нет'), false);
+check('число больше нуля — меню есть', menuFlag(352), true);
+check('ноль — меню нет', menuFlag(0), false);
+check('число строкой', menuFlag('105'), true);
+check('ноль строкой', menuFlag('0'), false);
+check('пусто', menuFlag(''), null);
+
+// ── пустая колонка — это не нули ──
+console.log('\nПустая колонка не считается прочитанной');
+const foundMap = g('foundMap_');
+const colRows = [
+  ['Школа', 'Карт', 'Транзакций', 'ПО прогружено'],
+  ['А', 5, null, 'нет данных'],
+  ['Б', 0, '',   'нет данных'],
+  ['В', 7, null, 'Да']
+];
+const fm = foundMap({ school: 0, cards: 1, cardTx: 2, skudSoft: 3, spend: -1 }, colRows, 0);
+check('колонка с числами прочитана', fm.cards, true);
+check('пустая колонка не прочитана', fm.cardTx, false);
+check('сплошное «нет данных» не прочитано', foundMap({ x: 3 }, [colRows[0], colRows[1], colRows[2]], 0).x, false);
+check('есть хоть одно «Да» — прочитана', fm.skudSoft, true);
+check('колонки нет вовсе', fm.spend, false);
+
 console.log(failed ? `\nПровалено проверок: ${failed}` : '\nВсе проверки пройдены.');
 process.exit(failed ? 1 : 0);

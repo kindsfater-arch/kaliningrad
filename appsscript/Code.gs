@@ -156,6 +156,7 @@ var OBLAST_LABELS = {
   menu: 'Признак наличия активного меню', complexes: 'Кол-во активных комплексов в меню',
   complexesTariff: 'Кол-во активных комплексов с привязанными тарифами',
   dishes: 'Кол-во активных блюд', orders: 'Кол-во заявок на питание',
+  buffet: 'Наличие буфета',
   sbs: 'Обновлено оборудование СБС', terminals: 'Кол-во терминалов',
   skudInst: 'Установлено (СКУД)', skudConn: 'Контроллеры подключены',
   skudSoft: 'ПО прогружено',
@@ -438,7 +439,30 @@ function num_(v) {
   return isNaN(n) ? 0 : n;
 }
 
-function yes_(v) { return /^да$/i.test(txt_(v)); }
+/**
+ * Колонки «Да/Нет» умеют отвечать и третьим вариантом. С 28.09 вместо «Нет»
+ * в «ПО прогружено» приходит «нет данных» — это не «не сделано», а «неизвестно»,
+ * и показывать такое как «Нет» значит приписывать выгрузке уверенность,
+ * которой в ней нет. Возвращаем true / false / null.
+ */
+function flag_(v) {
+  var t = txt_(v);
+  if (t === '' || /^нет данных$/i.test(t)) return null;
+  if (/^да$/i.test(t)) return true;
+  if (/^нет$/i.test(t)) return false;
+  return null;
+}
+
+/**
+ * «Признак наличия активного меню на дату» до 28.09 приходил как «Да»/«Нет»,
+ * а с 28.09 — числом. Ноль означает то же, что прежнее «Нет».
+ */
+function menuFlag_(v) {
+  if (typeof v === 'number') return v > 0;
+  var t = txt_(v);
+  if (/^\d+([.,]\d+)?$/.test(t)) return num_(t) > 0;
+  return flag_(t);
+}
 
 /**
  * Ищет колонку по заголовку. Сначала точное совпадение, и только потом подстрока:
@@ -666,6 +690,8 @@ function parseOblast_(book, updated) {
     school:          need_(findCol_(H, ['краткое наименование школы']), 'Краткое наименование школы'),
     kshpId:          findCol_(H, ['id кшп']),
     kshp:            need_(findCol_(H, ['наименование кшп']), 'Наименование КШП'),
+    buffet:          findCol_(H, ['наличие буфета']),
+    comment:         findCol_(H, ['комментарии']),
     pupils:          findCol_(H, ['кол-во учащихся']),
     // Задачи школы
     ls:              findCol_(H, ['кол-во привязанных лс']),
@@ -712,6 +738,9 @@ function parseOblast_(book, updated) {
       kshpId:          num_(row[C.kshpId]),
       kshpShort:       kshpShort_(row[C.kshp]),
       kshpFull:        txt_(row[C.kshp]),
+      buffet:          flag_(row[C.buffet]),
+      buffetNote:      txt_(row[C.buffet]),
+      comment:         txt_(row[C.comment]),
       pupils:          num_(row[C.pupils]),
       // Задачи школы
       ls:              num_(row[C.ls]),
@@ -720,22 +749,22 @@ function parseOblast_(book, updated) {
       mifare:          num_(row[C.mifare]),
       hmac:            num_(row[C.hmac]),
       parents:         num_(row[C.parents]),
-      kj:              yes_(row[C.kj]),
+      kj:              flag_(row[C.kj]),
       tariffs:         num_(row[C.tariffs]),
       tariffsActive:   num_(row[C.tariffsActive]),
       lsTariff:        num_(row[C.lsTariff]),
       // Задачи организатора питания
-      menu:            yes_(row[C.menu]),
+      menu:            menuFlag_(row[C.menu]),
       complexes:       num_(row[C.complexes]),
       complexesTariff: num_(row[C.complexesTariff]),
       dishes:          num_(row[C.dishes]),
       orders:          num_(row[C.orders]),
       // Оборудование
-      sbs:             yes_(row[C.sbs]),
+      sbs:             flag_(row[C.sbs]),
       terminals:       num_(row[C.terminals]),
-      skudInst:        yes_(row[C.skudInst]),
-      skudConn:        yes_(row[C.skudConn]),
-      skudSoft:        yes_(row[C.skudSoft]),
+      skudInst:        flag_(row[C.skudInst]),
+      skudConn:        flag_(row[C.skudConn]),
+      skudSoft:        flag_(row[C.skudSoft]),
       // Транзакции
       spend:           num_(row[C.spend]),
       cardTx:          num_(row[C.cardTx])
@@ -744,20 +773,36 @@ function parseOblast_(book, updated) {
   if (!schools.length) throw new Error('В отчёте по области не найдено ни одной строки со школой');
 
   var date = toIso_(sheet.name) ? txt_(sheet.name) : ddmmyyyy_(updated);
-  return { updated: ddmmyyyy_(updated), date: date, found: foundMap_(C), schools: schools };
+  return { updated: ddmmyyyy_(updated), date: date, found: foundMap_(C, rows, hr), schools: schools };
 }
 
 /**
- * Какие колонки удалось найти. Хранится в data/oblast.json и сверяется при следующей
- * сборке: колонка, которая читалась вчера и пропала сегодня, означает переименование.
- * Проверка по названию, а не по значениям, — единственная, что ловит такое сразу.
- * Так «Подключено» превратилось в «Контроллеры подключены», и дашборд несколько дней
- * показывал ноль подключённых СКУД, хотя подключены были все.
+ * Какие колонки удалось прочитать. Хранится в data/oblast.json и сверяется при
+ * следующей сборке: колонка, которая читалась вчера и не читается сегодня,
+ * означает, что выгрузка изменилась.
+ *
+ * Колонка считается прочитанной, только если в ней есть хоть одно содержательное
+ * значение. Пустая колонка — это не нули: 05.10 поставщик оставил «Сумма списаний
+ * за питание» и «Кол-во транзакций по картам» незаполненными, и без этой проверки
+ * дашборд сообщил бы, что транзакции прекратились. Сплошное «нет данных»
+ * считается тем же отсутствием.
  */
-function foundMap_(C) {
+function foundMap_(C, rows, hr) {
   var out = {};
-  for (var key in C) if (C.hasOwnProperty(key)) out[key] = (C[key] >= 0);
+  for (var key in C) {
+    if (!C.hasOwnProperty(key)) continue;
+    out[key] = C[key] >= 0 && colHasData_(rows, hr, C[key]);
+  }
   return out;
+}
+
+function colHasData_(rows, hr, idx) {
+  for (var r = hr + 1; r < rows.length; r++) {
+    var t = txt_((rows[r] || [])[idx]);
+    if (t === '' || /^нет данных$/i.test(t)) continue;
+    return true;
+  }
+  return false;
 }
 
 /** «Багратионовск город» → «Багратионовск»; «Янтарный поселок городского типа» → «Янтарный (пгт)». */
